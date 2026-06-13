@@ -1,15 +1,12 @@
 {
-  // Registers this project as a local (stdio) MCP server for VS Code.
-  // VS Code launches the server with `dotnet run` and talks JSON-RPC over stdio.
+  // VS Code dev convenience. Points at the SAME published exe Claude Desktop uses,
+  // so there is one runtime artifact and no `dotnet run` build step on launch.
+  // Re-publish after code changes:
+  //   dotnet publish -c Release -r win-x64 -o "$env:LOCALAPPDATA\PersonalServer"
   "servers": {
     "PersonalServer": {
       "type": "stdio",
-      "command": "dotnet",
-      "args": [
-        "run",
-        "--project",
-        "${workspaceFolder}/PersonalServer.csproj"
-      ]
+      "command": "C:\\Users\\randl\\AppData\\Local\\PersonalServer\\PersonalServer.exe"
     }
   }
 }

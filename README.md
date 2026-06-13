@@ -2,24 +2,32 @@
 
 A minimal [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server written in
 C# on **.NET 10**, using the official [`ModelContextProtocol`](https://www.nuget.org/packages/ModelContextProtocol)
-SDK and the `Microsoft.McpServer.ProjectTemplates` template.
+SDK. It is built to be used with the **Claude Desktop** client.
 
-It speaks **stdio only** — it's a console / Generic Host app that exchanges JSON-RPC frames over
+It speaks **stdio only** — a console / Generic Host app that exchanges JSON-RPC over
 stdin/stdout. `stdout` is reserved for the protocol; **all logging goes to stderr**.
 
-Right now it exposes a single tool, `ping`, used to verify the server works end-to-end. The
+Right now it exposes a single tool, `ping`, to verify the server works end-to-end. The
 knowledge-graph tooling is intentionally not built yet — see [Next: knowledge graph](#next-knowledge-graph).
+
+> **How an MCP stdio server runs:** it is *not* a daemon and you never start it yourself. The
+> client (Claude Desktop) launches the server as a child process on demand and talks to it over
+> stdio. So "always available" just means the client can spawn it instantly — which is why we
+> publish a fast, self-contained `.exe` and point Claude Desktop at it (no `dotnet run`, no SDK
+> needed at launch). A Windows service is *not* used: a detached service has no stdio pipe for a
+> client to attach to.
 
 ## Layout
 
 ```
-PersonalServer.csproj      # net10.0 console app, MCP packaging metadata
-Program.cs                 # Generic Host: stdio transport + WithToolsFromAssembly() + KG TODO
-Tools/PingTools.cs         # the `ping` health-check tool ([McpServerToolType])
-.mcp/server.json           # MCP server manifest (for NuGet packaging; placeholders)
-.vscode/mcp.json           # registers this server with VS Code over stdio
-scripts/smoke-ping.ps1     # non-interactive end-to-end smoke test
-KnowledgeGraph/README.md   # plan + extension point for the next milestone
+PersonalServer.csproj             # net10.0 console app, self-contained single-file publish
+Program.cs                        # Generic Host: stdio transport + WithToolsFromAssembly() + KG TODO
+Tools/PingTools.cs                # the `ping` health-check tool ([McpServerToolType])
+claude_desktop_config.sample.json # reference snippet for Claude Desktop's config
+.vscode/mcp.json                  # optional: same server for VS Code / MCP Inspector dev
+.mcp/server.json                  # MCP manifest (NuGet packaging; placeholders, unused for stdio)
+scripts/smoke-ping.ps1            # non-interactive end-to-end smoke test
+KnowledgeGraph/README.md          # plan + extension point for the next milestone
 ```
 
 ## The `ping` tool
@@ -30,50 +38,65 @@ KnowledgeGraph/README.md   # plan + extension point for the next milestone
 | Arg | `message` *(optional string)* |
 | Returns | `pong \| msg=<message> \| utc=<ISO-8601 UTC now>` |
 
-It's a health check: call it to confirm the server is alive and round-tripping requests.
+## Build & publish
 
-## Run it
-
-```powershell
-# Build
-dotnet build
-
-# Run the server (a client attaches over stdio)
-dotnet run --project PersonalServer.csproj
-```
-
-The server reads JSON-RPC from stdin and writes responses to stdout, so running it bare in a
-terminal just waits for a client. Attach it from a real client instead (below).
-
-## Test the `ping` tool
-
-### Option A — reusable smoke test (recommended, non-interactive)
+The server is published as a **self-contained, single-file exe** (no .NET runtime required on the
+target) to a stable location outside the repo, so the artifact survives `dotnet clean` and repo
+moves:
 
 ```powershell
-pwsh ./scripts/smoke-ping.ps1     # or: powershell -File scripts\smoke-ping.ps1
+dotnet publish -c Release -r win-x64 -o "$env:LOCALAPPDATA\PersonalServer"
+# -> %LOCALAPPDATA%\PersonalServer\PersonalServer.exe
 ```
 
-It builds the project, drives the server over stdio with `initialize` →
-`notifications/initialized` → `tools/list` → `tools/call ping`, prints the raw JSON-RPC
-responses, and asserts that `ping` is listed and returns `pong`.
+Re-run this after any code change, then restart Claude Desktop (below).
 
-> Note: a real MCP client keeps the stdio pipe open and reads replies as they arrive. Naively
-> piping a `.jsonl` file into the server (so stdin hits EOF immediately) can race the server's
-> response flush and drop output — the smoke-test script keeps stdin open until the responses
-> arrive, which is what a client does.
+## Use it from Claude Desktop
 
-### Option B — MCP Inspector (interactive)
+1. **Publish** the exe (above).
+2. **Edit Claude Desktop's config** at:
 
-```powershell
-npx @modelcontextprotocol/inspector dotnet run --project PersonalServer.csproj
-```
+   ```
+   %APPDATA%\Claude\claude_desktop_config.json
+   ```
 
-Open the Inspector UI, list tools, and invoke `ping` with `{"message":"hello"}`.
+   Add the `PersonalServer` entry (see [`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)).
+   If the file already has other servers, merge this into the existing `mcpServers` object:
 
-### Option C — VS Code
+   ```json
+   {
+     "mcpServers": {
+       "PersonalServer": {
+         "command": "C:\\Users\\randl\\AppData\\Local\\PersonalServer\\PersonalServer.exe"
+       }
+     }
+   }
+   ```
 
-`.vscode/mcp.json` already registers this server. Open the workspace in VS Code, start the
-`PersonalServer` MCP server, and call `ping` from chat.
+3. **Fully restart Claude Desktop.** Closing the window isn't enough — quit it from the system
+   tray (right-click → Quit) and relaunch, so it reloads the config and spawns the server.
+4. **Verify:** open the tools/MCP menu in Claude Desktop and confirm `PersonalServer` → `ping` is
+   listed, then ask Claude to *"call the ping tool with message hello."* You should get back
+   `pong | msg=hello | utc=...`.
+
+> Note: editing the server's source requires a **re-publish** (step 1) and a **restart** of Claude
+> Desktop to take effect — the running exe is a snapshot, not live source.
+
+## Other ways to run / test
+
+- **Reusable smoke test (no client needed):**
+  ```powershell
+  powershell -File scripts\smoke-ping.ps1
+  ```
+  Builds the project, drives the server over stdio (`initialize` → `notifications/initialized` →
+  `tools/list` → `tools/call ping`), prints the raw JSON-RPC, and asserts `ping`/`pong`.
+
+- **MCP Inspector (interactive):**
+  ```powershell
+  npx @modelcontextprotocol/inspector "$env:LOCALAPPDATA\PersonalServer\PersonalServer.exe"
+  ```
+
+- **VS Code:** `.vscode/mcp.json` points at the same published exe.
 
 ## Next: knowledge graph
 
@@ -87,5 +110,4 @@ point is already wired:
 - A `TODO(knowledge-graph)` marker in `Program.cs` flags where the registration converges.
 - See [`KnowledgeGraph/README.md`](KnowledgeGraph/README.md) for the plan.
 
-These tools are **not implemented yet** — this README and the scaffold deliberately stop at a
-working `ping`.
+These tools are **not implemented yet** — the scaffold deliberately stops at a working `ping`.
