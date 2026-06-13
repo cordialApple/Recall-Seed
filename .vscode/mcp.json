@@ -1,0 +1,15 @@
+{
+  // Registers this project as a local (stdio) MCP server for VS Code.
+  // VS Code launches the server with `dotnet run` and talks JSON-RPC over stdio.
+  "servers": {
+    "PersonalServer": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/PersonalServer.csproj"
+      ]
+    }
+  }
+}
