@@ -57,6 +57,11 @@ Re-run this after any code change, then restart Claude Desktop (below).
 2. **Edit Claude Desktop's config** at:
 
    ```
+   # Microsoft Store / packaged (MSIX) install — what THIS machine uses.
+   # Packaged apps virtualize AppData, so they do NOT read %APPDATA%\Claude\.
+   %LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json
+
+   # Standalone (non-Store) install would instead use:
    %APPDATA%\Claude\claude_desktop_config.json
    ```
 
@@ -81,6 +86,11 @@ Re-run this after any code change, then restart Claude Desktop (below).
 
 > Note: editing the server's source requires a **re-publish** (step 1) and a **restart** of Claude
 > Desktop to take effect — the running exe is a snapshot, not live source.
+
+> **Editing the config on the Store build:** quit Claude Desktop *completely* first (tray → Quit,
+> confirm no `Claude.exe` remain). The packaged app rewrites `claude_desktop_config.json` on
+> preference changes and will clobber edits made while it's running. Troubleshooting logs live next
+> to the config: `…\LocalCache\Roaming\Claude\logs\mcp-server-PersonalServer.log`.
 
 ## Other ways to run / test
 
