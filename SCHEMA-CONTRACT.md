@@ -110,5 +110,27 @@ embed pipeline owns them), any `*_fts` table (trigger-maintained), `schema_migra
 Semantic (vector-KNN) retrieval and grounded story generation stay in STARfolio. When an MCP
 client needs them, PersonalServer calls a loopback HTTP API STARfolio exposes on `127.0.0.1`
 (port/token written to a file under `userData`; read, never guessed). Unreachable ⇒ tools return
-`{ error: "starfolio_not_running" }` and the client falls back to the read tools. Details land
-with Stage 3.
+`{ error: "starfolio_not_running" }` and the client falls back to the read tools.
+
+**Handshake file.** While the loopback server runs, STARfolio writes `loopback.json` next to
+`superstar.db` (`%APPDATA%\STARfolio\loopback.json`; PersonalServer resolves it there, or from the
+`SUPERSTAR_LOOPBACK_FILE` override). Shape: `{ "port": <int>, "token": "<secret>" }`. The C# side
+reads it every call, never caches a port. Missing file, or a file present but the socket refuses /
+times out, both mean "not running" → `starfolio_not_running`. The `token` is a local loopback
+credential (not the Anthropic key); it is sent as `Authorization: Bearer <token>` to `127.0.0.1`
+only and never logged.
+
+**Endpoints** (both `POST`, JSON in/out, bearer-authenticated):
+
+| Endpoint | Request | Response |
+|---|---|---|
+| `/retrieve` | `{ query, limit }` | `{ "results": [ { experience_id, title, score, snippet } ] }` |
+| `/generate` | `{ experience_ids, genre?, jd?, length? }` | `{ "story": "<text>", "experience_ids": [ ... ] }` |
+
+`/generate` grounding is enforced STARfolio-side (story built only from the named experiences,
+provenance returned). PersonalServer passes the story and `experience_ids` through unchanged —
+it never edits or re-authors generated content.
+
+**STARfolio side (server impl) is deferred**, like the Stage 0 views migration: the C# proxy
+half + this contract land first; STARfolio adds the localhost server behind a setting later.
+Until then these two tools return `starfolio_not_running` by design.
