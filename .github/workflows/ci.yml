@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (Release)
+        run: dotnet build PersonalServer.csproj -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/PersonalServer.Tests -c Release
+
+      - name: Smoke (stdio end-to-end)
+        shell: pwsh
+        run: ./scripts/smoke-ping.ps1 -Configuration Release
