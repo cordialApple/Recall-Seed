@@ -1,0 +1,33 @@
+name: auto-merge
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Squash-merge the PR when it carries the auto-merge label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '.[] | select(.state=="open") | .number' | head -n1)
+          if [ -z "$pr" ]; then echo "no open PR for $SHA"; exit 0; fi
+          labels=$(gh pr view "$pr" --repo "$REPO" --json labels --jq '.labels[].name')
+          if echo "$labels" | grep -qx "auto-merge"; then
+            echo "CI green + auto-merge label present -> squash-merging PR #$pr"
+            gh pr merge "$pr" --repo "$REPO" --squash --delete-branch
+          else
+            echo "PR #$pr not labeled auto-merge; leaving it open"
+          fi
