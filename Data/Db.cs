@@ -32,8 +32,16 @@ public static class Db
     public static SqliteConnection OpenReadOnly(string? path = null)
     {
         var conn = Open(path ?? ResolveDbPath(), SqliteOpenMode.ReadWrite);
-        Exec(conn, "PRAGMA query_only = ON;");
-        return conn;
+        try
+        {
+            Exec(conn, "PRAGMA query_only = ON;");
+            return conn;
+        }
+        catch
+        {
+            conn.Dispose();
+            throw;
+        }
     }
 
     public static SqliteConnection OpenReadWrite(string? path = null)
@@ -53,10 +61,18 @@ public static class Db
         }.ToString();
 
         var conn = new SqliteConnection(connectionString);
-        conn.Open();
-        Exec(conn, "PRAGMA busy_timeout = 5000;");
-        Exec(conn, "PRAGMA foreign_keys = ON;");
-        return conn;
+        try
+        {
+            conn.Open();
+            Exec(conn, "PRAGMA busy_timeout = 5000;");
+            Exec(conn, "PRAGMA foreign_keys = ON;");
+            return conn;
+        }
+        catch
+        {
+            conn.Dispose();
+            throw;
+        }
     }
 
     static void Exec(SqliteConnection conn, string sql)
