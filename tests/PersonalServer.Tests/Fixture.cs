@@ -50,6 +50,7 @@ internal static class Fixture
         CREATE TABLE experience_sources (experience_id TEXT NOT NULL, source_id TEXT NOT NULL, PRIMARY KEY (experience_id, source_id));
         CREATE TABLE entities (id TEXT PRIMARY KEY, kind TEXT NOT NULL, name TEXT NOT NULL, meta_json TEXT, created_at TEXT, UNIQUE (kind, name));
         CREATE TABLE edges (id TEXT PRIMARY KEY, src_kind TEXT NOT NULL, src_id TEXT NOT NULL, rel TEXT NOT NULL, dst_kind TEXT NOT NULL, dst_id TEXT NOT NULL, meta_json TEXT, UNIQUE (src_kind, src_id, rel, dst_kind, dst_id));
+        CREATE TABLE embed_queue (experience_id TEXT PRIMARY KEY, enqueued_at TEXT NOT NULL DEFAULT (datetime('now')));
 
         CREATE VIRTUAL TABLE experiences_fts USING fts5(title, situation, task, action, result_text, content='experiences', content_rowid='rowid');
         CREATE TRIGGER experiences_fts_ai AFTER INSERT ON experiences BEGIN
