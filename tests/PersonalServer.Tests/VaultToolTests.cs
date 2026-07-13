@@ -1,0 +1,233 @@
+using PersonalServer.Vault;
+
+namespace PersonalServer.Tests;
+
+public class VaultToolTests : IDisposable
+{
+    readonly string _vault;
+
+    public VaultToolTests()
+    {
+        _vault = Path.Combine(Path.GetTempPath(), "psrv-vault-" + Guid.NewGuid().ToString("N"));
+        var exp = Path.Combine(_vault, "experiences");
+        Directory.CreateDirectory(exp);
+
+        File.WriteAllText(Path.Combine(_vault, "Payments.md"), "# Payments\n");
+        File.WriteAllText(Path.Combine(_vault, "React.md"), "# React\n");
+
+        File.WriteAllText(Path.Combine(exp, "a-mig.md"), """
+            ---
+            id: a-mig
+            title: Led database migration
+            context: work
+            status: confirmed
+            confidence:
+              situation: high
+              task: high
+              action: high
+              result: high
+            skills:
+              - name: leadership
+                kind: soft
+              - name: sql
+                kind: technical
+            tags: [backend]
+            metrics:
+              - label: downtime
+                value: 0
+                unit: min
+            entities: ["[[Payments]]"]
+            ---
+
+            ## Situation
+            payments db was on an unsupported version.
+
+            ## Task
+            plan and run the cutover with zero downtime.
+
+            ## Action
+            coordinated the migration and ran the cutover.
+
+            ## Result
+            zero downtime during the switch.
+            """);
+
+        File.WriteAllText(Path.Combine(exp, "b-dash.md"), """
+            ---
+            id: b-dash
+            title: Built React dashboard
+            context: project
+            status: draft
+            confidence:
+              situation: low
+              action: high
+            skills:
+              - name: react
+                kind: technical
+            tags: [frontend]
+            metrics: []
+            entities: ["[[React]]"]
+            ---
+
+            ## Situation
+
+            ## Action
+            shipped the dashboard UI in React.
+
+            ## Gaps
+            - [ ] what problem did the dashboard solve?
+            - [ ] any adoption metric?
+            """);
+
+        Environment.SetEnvironmentVariable(VaultStore.EnvVar, _vault);
+    }
+
+    [Fact]
+    public void BankExperience_returns_matching_prompt_and_known_entities()
+    {
+        var notes = BankTools.BankExperience("did a thing", "notes");
+        Assert.Null(notes.Error);
+        Assert.Contains("messy notes", notes.Instruction);
+        Assert.Contains("Payments", notes.KnownEntities);
+        Assert.Contains("React", notes.KnownEntities);
+
+        Assert.Contains("resume", BankTools.BankExperience("x", "resume").Instruction);
+        Assert.Contains("evidence", BankTools.BankExperience("x", "evidence").Instruction);
+    }
+
+    [Fact]
+    public void BankExperience_validates_input_and_kind()
+    {
+        Assert.Equal("input must not be empty", BankTools.BankExperience("  ", "notes").Error);
+        Assert.Contains("invalid kind", BankTools.BankExperience("x", "bogus").Error);
+    }
+
+    [Fact]
+    public void WriteExperience_persists_a_grounded_note_visible_to_other_tools()
+    {
+        var before = TendencyTools.FindTendencies().Stats.ExperienceCount;
+
+        var res = BankTools.WriteExperience(
+            id: "2026-07-12-cache-fix", title: "Cut API latency",
+            situation: null, task: null, action: "added a read-through cache", result: "p95 dropped",
+            actionConfidence: "high", context: "work",
+            skills: [new VaultSkill("caching", "technical")],
+            tags: ["performance"],
+            metrics: [new VaultMetric("p95 latency", 40, "ms")],
+            entities: ["Redis", "[[Payments]]"],
+            gaps: ["what was the baseline latency?"]);
+
+        Assert.Null(res.Error);
+        Assert.Equal("2026-07-12-cache-fix", res.Id);
+        Assert.True(File.Exists(res.Path));
+
+        var file = File.ReadAllText(res.Path!);
+        Assert.Contains("label: p95 latency", file);
+        Assert.Contains("value: 40", file);
+        Assert.Contains("[[Redis]]", file);
+
+        Assert.Equal(before + 1, TendencyTools.FindTendencies().Stats.ExperienceCount);
+    }
+
+    [Fact]
+    public void WriteExperience_validates_title_and_beats()
+    {
+        Assert.Equal("title must not be empty", BankTools.WriteExperience(null, "  ").Error);
+        Assert.Contains("at least one STAR beat", BankTools.WriteExperience("id", "T").Error);
+        Assert.Contains("invalid context", BankTools.WriteExperience("id", "T", action: "did", context: "nope").Error);
+    }
+
+    [Fact]
+    public void TailorBullets_returns_blocks_with_verbatim_metrics()
+    {
+        var res = ResumeTools.TailorBullets("backend engineer, databases");
+        Assert.Null(res.Error);
+        Assert.Contains("experience_id", res.Instruction);
+
+        var mig = Assert.Single(res.Experiences, b => b.Id == "a-mig");
+        var metric = Assert.Single(mig.Metrics);
+        Assert.Equal("downtime", metric.Label);
+        Assert.Equal(0, metric.Value);
+        Assert.Equal("min", metric.Unit);
+
+        Assert.Equal("jd must not be empty", ResumeTools.TailorBullets(" ").Error);
+    }
+
+    [Fact]
+    public void FindTendencies_aggregates_real_counts()
+    {
+        var s = TendencyTools.FindTendencies().Stats;
+        Assert.Equal(2, s.ExperienceCount);
+        Assert.Equal(1, s.Confirmed);
+        Assert.Equal(1, s.Draft);
+        Assert.Equal(1, s.WithMetrics);
+        Assert.Equal(1, s.WithoutMetrics);
+        Assert.Equal(2, s.OpenGaps);
+        Assert.Contains(s.Skills, c => c.Name == "leadership" && c.Count == 1);
+        Assert.Contains(s.Contexts, c => c.Name == "work" && c.Count == 1);
+        Assert.Contains(s.Contexts, c => c.Name == "project" && c.Count == 1);
+    }
+
+    [Fact]
+    public void ExpertiseProfile_evidences_skills_and_strongest_results()
+    {
+        var res = ExpertiseTools.ExpertiseProfile();
+        Assert.Null(res.Error);
+
+        var sql = Assert.Single(res.Skills, s => s.Name == "sql");
+        Assert.Equal("technical", sql.Kind);
+        Assert.Contains("a-mig", sql.ExperienceIds);
+
+        var strong = Assert.Single(res.StrongestResults);
+        Assert.Equal("a-mig", strong.Id);
+        Assert.Contains("backend", res.Domains);
+    }
+
+    [Fact]
+    public void DefendRepo_builds_cited_chunks_and_scopes_by_topic()
+    {
+        var all = InterviewTools.DefendRepo();
+        Assert.Null(all.Error);
+        Assert.Contains(all.Corpus, c => c.ChunkId == "a-mig#action");
+        Assert.DoesNotContain(all.Corpus, c => c.ChunkId == "b-dash#situation");
+        Assert.Contains("ensureCited", all.Invariant);
+
+        var scoped = InterviewTools.DefendRepo("react dashboard");
+        Assert.All(scoped.Corpus, c => Assert.StartsWith("b-dash", c.ChunkId));
+    }
+
+    [Fact]
+    public void CheckCitation_enforces_real_chunk_ids()
+    {
+        var ok = InterviewTools.CheckCitation(["a-mig#action"]);
+        Assert.True(ok.Ok);
+        Assert.Empty(ok.Unknown);
+
+        var bad = InterviewTools.CheckCitation(["a-mig#action", "a-mig#invented"]);
+        Assert.False(bad.Ok);
+        Assert.Contains("a-mig#invented", bad.Unknown);
+    }
+
+    [Fact]
+    public void VoiceGuide_returns_rules_and_recent_samples()
+    {
+        var res = VoiceTools.VoiceGuide(2);
+        Assert.Null(res.Error);
+        Assert.Contains("lowercase", res.Rules);
+        Assert.NotEmpty(res.RecentSamples);
+    }
+
+    [Fact]
+    public void Tools_report_missing_vault()
+    {
+        Environment.SetEnvironmentVariable(VaultStore.EnvVar, Path.Combine(_vault, "does-not-exist"));
+        Assert.Contains("not found", TendencyTools.FindTendencies().Error);
+        Assert.Contains("not found", ResumeTools.TailorBullets("x").Error);
+    }
+
+    public void Dispose()
+    {
+        Environment.SetEnvironmentVariable(VaultStore.EnvVar, null);
+        try { Directory.Delete(_vault, true); } catch { }
+    }
+}
