@@ -7,9 +7,9 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace PersonalServer.Vault;
 
 /// <summary>
-/// Reads and writes the Obsidian-style experience vault as plain markdown — the source of truth,
-/// independent of superstar.db and STARfolio. One experience = one file under experiences/;
-/// entity notes are the vault-root *.md files that [[wikilinks]] resolve to.
+/// Reads and writes the Obsidian-style experience vault as plain markdown — the single source of
+/// truth. One experience = one file under experiences/; entity notes are the vault-root *.md files
+/// that [[wikilinks]] resolve to, so backlinks are the knowledge graph for free.
 /// </summary>
 internal static partial class VaultStore
 {

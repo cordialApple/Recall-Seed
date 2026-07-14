@@ -26,6 +26,10 @@ grounded prompt + the real corpus/aggregates and hands them back; the agent exec
 |---|---|
 | `bank_experience` | returns the matching grounded extractor (notes/resume/evidence) + entity prompt + STAR schema + write rules + known vault entities |
 | `write_experience` | commits a grounded STAR note to `experiences/` (frontmatter + beats + gap todos), metrics verbatim, entities as `[[wikilinks]]` |
+| `search_experiences` | free-text search over the vault (title/beats/tags/skills/entities), ranked, with snippets |
+| `query_experiences` | structured filter by skills / tags / context / status → experience cards |
+| `get_experience` | fetch one full note by id (frontmatter + beats + metrics + entities + gaps) |
+| `neighbors` | experiences connected via a shared `[[wikilink]]` entity or a shared skill — the graph, emergent from backlinks |
 | `tailor_bullets` | vault as tagged blocks + the BULLETS prompt → JD-tailored resume bullets, each grounded to one experience id |
 | `find_tendencies` | real cross-vault aggregates (skill/tag/context/entity freq, metric coverage, gaps, draft vs confirmed) + the tendency prompt |
 | `expertise_profile` | skills weighted by evidence count (+ ids), metric-carrying results, recurring domains + the expertise prompt |

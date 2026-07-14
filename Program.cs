@@ -15,9 +15,4 @@ builder.Services
     .WithStdioServerTransport()
     .WithToolsFromAssembly();
 
-// TODO(knowledge-graph): extension point for the next milestone.
-// The planned KG tools — query, add_entity, search_nodes, get_schema — will live under
-// KnowledgeGraph/ as classes annotated with [McpServerToolType], so WithToolsFromAssembly()
-// above will pick them up automatically with no change to this file. See KnowledgeGraph/README.md.
-
 await builder.Build().RunAsync();

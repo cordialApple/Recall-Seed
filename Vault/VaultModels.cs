@@ -106,3 +106,31 @@ public record CitationCheck(bool Ok, IReadOnlyList<string> Unknown, string? Erro
 public record VoiceSample(string Id, string Excerpt);
 
 public record VoiceResult(string Rules, IReadOnlyList<VoiceSample> RecentSamples, string? Error = null);
+
+public record ExperienceHit(string Id, string Title, string Context, string Status, string Snippet);
+
+public record SearchResult(IReadOnlyList<ExperienceHit> Hits, string? Error = null);
+
+public record ExperienceCard(
+    string Id,
+    string Title,
+    string Context,
+    string Status,
+    IReadOnlyList<string> Skills,
+    IReadOnlyList<string> Tags,
+    IReadOnlyList<VaultMetric> Metrics);
+
+public record QueryResult(IReadOnlyList<ExperienceCard> Experiences, string? Error = null);
+
+public record GetResult(Experience? Experience, string? Error = null);
+
+public record NeighborConnection(
+    string ExperienceId,
+    string Title,
+    IReadOnlyList<string> ViaEntities,
+    IReadOnlyList<string> ViaSkills);
+
+public record NeighborsResult(
+    IReadOnlyList<string> Entities,
+    IReadOnlyList<NeighborConnection> Connections,
+    string? Error = null);
