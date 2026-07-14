@@ -31,6 +31,7 @@ grounded prompt + the real corpus/aggregates and hands them back; the agent exec
 | `get_experience` | fetch one full note by id (frontmatter + beats + metrics + entities + gaps) |
 | `neighbors` | experiences connected via a shared `[[wikilink]]` entity or a shared skill — the graph, emergent from backlinks |
 | `tailor_bullets` | vault as tagged blocks + the BULLETS prompt → JD-tailored resume bullets, each grounded to one experience id |
+| `generate_story` | named experiences + behavioral-answer prompt + voice rules → a grounded spoken interview answer, provenance to their ids |
 | `find_tendencies` | real cross-vault aggregates (skill/tag/context/entity freq, metric coverage, gaps, draft vs confirmed) + the tendency prompt |
 | `expertise_profile` | skills weighted by evidence count (+ ids), metric-carrying results, recurring domains + the expertise prompt |
 | `defend_repo` | the person's experiences as cited corpus chunks (`id#beat`) + interviewer prompt + ensureCited invariant; optional topic scope |

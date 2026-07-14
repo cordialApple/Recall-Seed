@@ -67,6 +67,12 @@ public record TailorResult(
     IReadOnlyList<ExperienceBlock> Experiences,
     string? Error = null);
 
+public record StoryResult(
+    string Instruction,
+    string VoiceRules,
+    IReadOnlyList<ExperienceBlock> Experiences,
+    string? Error = null);
+
 public record TendencyStats(
     int ExperienceCount,
     int Confirmed,
