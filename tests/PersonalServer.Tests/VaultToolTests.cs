@@ -218,11 +218,65 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void SearchExperiences_ranks_matches_with_snippet()
+    {
+        var res = SearchTools.SearchExperiences("cutover downtime");
+        Assert.Null(res.Error);
+        var top = res.Hits.First();
+        Assert.Equal("a-mig", top.Id);
+        Assert.False(string.IsNullOrWhiteSpace(top.Snippet));
+
+        Assert.Empty(SearchTools.SearchExperiences("nonexistentterm").Hits);
+        Assert.Equal("query must not be empty", SearchTools.SearchExperiences(" ").Error);
+    }
+
+    [Fact]
+    public void QueryExperiences_filters_by_named_facets()
+    {
+        Assert.Equal("a-mig", Assert.Single(SearchTools.QueryExperiences(skills: ["sql"]).Experiences).Id);
+        Assert.Equal("b-dash", Assert.Single(SearchTools.QueryExperiences(context: "project").Experiences).Id);
+        Assert.Equal("a-mig", Assert.Single(SearchTools.QueryExperiences(status: "confirmed").Experiences).Id);
+        Assert.Equal(2, SearchTools.QueryExperiences().Experiences.Count);
+    }
+
+    [Fact]
+    public void GetExperience_returns_full_note_or_error()
+    {
+        var res = SearchTools.GetExperience("a-mig");
+        Assert.Null(res.Error);
+        Assert.Equal("Led database migration", res.Experience!.Title);
+        Assert.Contains("cutover", res.Experience.Action);
+
+        Assert.Contains("no experience with id", SearchTools.GetExperience("ghost").Error);
+    }
+
+    [Fact]
+    public void Neighbors_connects_via_shared_entity_and_skill()
+    {
+        BankTools.WriteExperience(
+            id: "c-pay", title: "More payments work", action: "tuned payments queries",
+            actionConfidence: "high", context: "work",
+            skills: [new VaultSkill("sql", "technical")], tags: null, metrics: null,
+            entities: ["Payments"], gaps: null);
+
+        var res = GraphTools.Neighbors("a-mig");
+        Assert.Null(res.Error);
+        Assert.Contains("[[Payments]]", res.Entities);
+
+        var conn = Assert.Single(res.Connections, c => c.ExperienceId == "c-pay");
+        Assert.Contains("[[Payments]]", conn.ViaEntities);
+        Assert.Contains("sql", conn.ViaSkills);
+
+        Assert.Contains("no experience with id", GraphTools.Neighbors("ghost").Error);
+    }
+
+    [Fact]
     public void Tools_report_missing_vault()
     {
         Environment.SetEnvironmentVariable(VaultStore.EnvVar, Path.Combine(_vault, "does-not-exist"));
         Assert.Contains("not found", TendencyTools.FindTendencies().Error);
         Assert.Contains("not found", ResumeTools.TailorBullets("x").Error);
+        Assert.Contains("not found", SearchTools.SearchExperiences("x").Error);
     }
 
     public void Dispose()
