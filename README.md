@@ -41,6 +41,7 @@ See [`Vault/README.md`](Vault/README.md) for the full rationale.
 | `get_experience` | fetch one full note by id |
 | `neighbors` | experiences connected via shared entity or skill |
 | `tailor_bullets` | vault blocks + BULLETS prompt → JD-tailored resume bullets, grounded per id |
+| `generate_story` | named experiences + behavioral-answer prompt + voice → a spoken interview answer, grounded to their ids |
 | `find_tendencies` | real cross-vault aggregates + tendency-analysis prompt |
 | `expertise_profile` | skills weighted by evidence count, metric-carrying results, domains |
 | `defend_repo` | own experiences as cited corpus chunks + interviewer prompt + ensureCited |

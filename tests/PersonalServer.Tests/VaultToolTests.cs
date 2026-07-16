@@ -271,6 +271,22 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void GenerateStory_grounds_answer_in_named_experiences_with_voice()
+    {
+        var res = StoryTools.GenerateStory(["a-mig"]);
+        Assert.Null(res.Error);
+        Assert.Contains("behavioral", res.Instruction);
+        Assert.Contains("lowercase", res.VoiceRules);
+
+        var block = Assert.Single(res.Experiences);
+        Assert.Equal("a-mig", block.Id);
+        Assert.Equal("downtime", Assert.Single(block.Metrics).Label);
+
+        Assert.Equal("experienceIds must not be empty", StoryTools.GenerateStory([]).Error);
+        Assert.Contains("no experiences matched", StoryTools.GenerateStory(["ghost"]).Error);
+    }
+
+    [Fact]
     public void Tools_report_missing_vault()
     {
         Environment.SetEnvironmentVariable(VaultStore.EnvVar, Path.Combine(_vault, "does-not-exist"));
