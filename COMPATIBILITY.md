@@ -25,8 +25,8 @@ deltas, so the two stay interoperable.
 | skills | `skills: [{name, kind: technical\|soft\|domain}]` | joined `skills(name, kind)` | same |
 | tags | `tags: [string]` | joined `tags` | same |
 | metrics | `metrics: [{label, value?, unit?}]` | joined `metrics(label, value, unit)` | same |
-| entities | `entities: [[[wikilink]]]` + backlinks | `entities(kind: person\|team\|project\|org\|tool\|other)` + `edges` | same kinds, **graph is emergent here (no edges table)** |
-| story/answer framing | `generate_story` `kind: jd\|genre` (A1) | `story.kind: jd\|genre` | same |
+| entities | `entities: [[[wikilink]]]` (names only) + backlinks | `entities(kind, name)` + `edges` | **graph is emergent here (no edges table); entity kind is prompt-level convention, not stored** |
+| story/answer framing | `generate_story` `kind: jd\|genre` (A1) | story prompt `kind: jd\|genre` (nested in `prompt_json`, not a `stories` column) | same knob |
 | provenance | bullets/story cite experience `id` | `stories.experience_ids_json` | same at the id level |
 
 ## Deltas (not blocking)
