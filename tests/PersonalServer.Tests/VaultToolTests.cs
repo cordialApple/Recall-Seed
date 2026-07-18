@@ -138,6 +138,57 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void UpdateExperience_patches_only_given_fields()
+    {
+        var before = SearchTools.GetExperience("a-mig").Experience!;
+
+        var res = BankTools.UpdateExperience("a-mig",
+            result: "zero downtime, 2M users unaffected", resultConfidence: "high",
+            metrics: [new VaultMetric("users unaffected", 2, "M"), new VaultMetric("downtime", 0, "min")]);
+        Assert.Null(res.Error);
+
+        var after = SearchTools.GetExperience("a-mig").Experience!;
+        Assert.Equal("zero downtime, 2M users unaffected", after.Result);
+        Assert.Equal(before.Action, after.Action);
+        Assert.Equal(before.Title, after.Title);
+        Assert.Equal("high", after.Confidence["result"]);
+        Assert.Contains(after.Metrics, m => m.Label == "users unaffected" && m.Value == 2);
+
+        Assert.Contains("no experience with id", BankTools.UpdateExperience("ghost", title: "x").Error);
+    }
+
+    [Fact]
+    public void ConfirmExperience_gates_on_gaps_and_thin_beats()
+    {
+        var blocked = BankTools.ConfirmExperience("b-dash");
+        Assert.NotNull(blocked.Error);
+        Assert.Contains("cannot confirm", blocked.Error);
+
+        BankTools.WriteExperience(id: "clean", title: "Clean one",
+            action: "did the thing", result: "it worked well",
+            actionConfidence: "high", resultConfidence: "high", context: "work", status: "draft");
+        var ok = BankTools.ConfirmExperience("clean");
+        Assert.Null(ok.Error);
+        Assert.Equal("confirmed", SearchTools.GetExperience("clean").Experience!.Status);
+
+        Assert.Contains("no experience with id", BankTools.ConfirmExperience("ghost").Error);
+    }
+
+    [Fact]
+    public void UpdateExperience_then_confirm_completes_the_loop()
+    {
+        var upd = BankTools.UpdateExperience("b-dash",
+            situation: "team had no adoption visibility", situationConfidence: "medium",
+            result: "dashboard adopted by the whole team", resultConfidence: "high",
+            gaps: []);
+        Assert.Null(upd.Error);
+
+        var confirmed = BankTools.ConfirmExperience("b-dash");
+        Assert.Null(confirmed.Error);
+        Assert.Equal("confirmed", SearchTools.GetExperience("b-dash").Experience!.Status);
+    }
+
+    [Fact]
     public void TailorBullets_returns_blocks_with_verbatim_metrics()
     {
         var res = ResumeTools.TailorBullets("backend engineer, databases");
