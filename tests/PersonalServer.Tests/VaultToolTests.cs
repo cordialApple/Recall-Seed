@@ -287,6 +287,28 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void GenerateStory_accepts_length_tone_kind_knobs_and_defaults()
+    {
+        var def = StoryTools.GenerateStory(["a-mig"]);
+        Assert.Null(def.Error);
+        Assert.Equal("genre", def.Kind);
+        Assert.Contains("90-second", def.Directive);
+        Assert.Contains("professional", def.Directive);
+
+        var jd = StoryTools.GenerateStory(["a-mig"], length: "short", tone: "confident", kind: "jd", target: "backend role, databases");
+        Assert.Null(jd.Error);
+        Assert.Equal("jd", jd.Kind);
+        Assert.Equal("backend role, databases", jd.Target);
+        Assert.Contains("30-second", jd.Directive);
+        Assert.Contains("confident", jd.Directive);
+
+        Assert.Contains("length must be", StoryTools.GenerateStory(["a-mig"], length: "epic").Error);
+        Assert.Contains("tone must be", StoryTools.GenerateStory(["a-mig"], tone: "sassy").Error);
+        Assert.Contains("kind must be", StoryTools.GenerateStory(["a-mig"], kind: "bogus").Error);
+        Assert.Contains("needs a target", StoryTools.GenerateStory(["a-mig"], kind: "jd").Error);
+    }
+
+    [Fact]
     public void Tools_report_missing_vault()
     {
         Environment.SetEnvironmentVariable(VaultStore.EnvVar, Path.Combine(_vault, "does-not-exist"));
