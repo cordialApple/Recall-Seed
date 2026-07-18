@@ -40,7 +40,7 @@ deltas, so the two stay interoperable.
   content-hash named); the vault has no attachment store. Provenance here is the note itself plus its
   gap questions.
 - **Graph**: STARfolio uses an explicit `edges` table; the vault derives the graph from `[[wikilinks]]`
-  and backlinks. Same entity kinds either way.
+  and backlinks. Entity kind is a prompt-level convention here; STARfolio stores it explicitly.
 
 ## Discipline (identical on both sides)
 
