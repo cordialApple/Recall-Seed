@@ -138,3 +138,7 @@ snapshot, not live source.
   ```powershell
   npx @modelcontextprotocol/inspector "$env:LOCALAPPDATA\PersonalServer\PersonalServer.exe"
   ```
+
+## License
+
+[MIT](LICENSE).

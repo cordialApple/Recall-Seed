@@ -8,8 +8,7 @@ deltas, so the two stay interoperable.
 - **PersonalServer**: one markdown note per experience under `experiences/`, frontmatter + `##` beats.
   Entities are `[[wikilinks]]`; backlinks are the graph. No database.
 - **STARfolio**: SQLite (`superstar.db`), `experiences` table + joined `skills`/`tags`/`metrics`/
-  `sources`, plus `entities` + `edges` for the graph. Reference:
-  `../SuperSTAR/app/src/main/db/repositories/experiences.ts`, `docs/architecture/data-model.md`.
+  `sources`, plus `entities` + `edges` for the graph.
 
 ## Field map
 
@@ -46,5 +45,4 @@ deltas, so the two stay interoperable.
 
 Grounding and citation are the shared moat: never invent a fact, number, employer, or outcome; keep
 metrics verbatim; an absent beat stays thin + low-confidence + a gap question, never self-filled;
-every interview question cites a real corpus chunk. See `Vault/Prompts.cs` here and
-`../SuperSTAR/app/src/main/ai/*.ts` there.
+every interview question cites a real corpus chunk. See `Vault/Prompts.cs` for the enforced rules.
