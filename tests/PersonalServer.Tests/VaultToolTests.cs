@@ -122,7 +122,7 @@ public class VaultToolTests : IDisposable
         Assert.True(File.Exists(res.Path));
 
         var file = File.ReadAllText(res.Path!);
-        Assert.Contains("label: p95 latency", file);
+        Assert.Contains("label: \"p95 latency\"", file);
         Assert.Contains("value: 40", file);
         Assert.Contains("[[Redis]]", file);
 
@@ -155,6 +155,36 @@ public class VaultToolTests : IDisposable
         Assert.Contains(after.Metrics, m => m.Label == "users unaffected" && m.Value == 2);
 
         Assert.Contains("no experience with id", BankTools.UpdateExperience("ghost", title: "x").Error);
+        Assert.Contains("title must not be empty", BankTools.UpdateExperience("a-mig", title: "  ").Error);
+    }
+
+    [Fact]
+    public void UpdateExperience_preserves_fields_when_a_value_holds_yaml_specials()
+    {
+        BankTools.WriteExperience(id: "colon", title: "Migration: cut latency 40%",
+            action: "did it", actionConfidence: "high", context: "work",
+            skills: [new VaultSkill("sql", "technical")],
+            metrics: [new VaultMetric("p95: latency", 40, "ms")],
+            entities: ["Payments"], status: "draft");
+
+        Assert.Null(BankTools.UpdateExperience("colon", result: "shipped").Error);
+
+        var after = SearchTools.GetExperience("colon").Experience!;
+        Assert.Equal("Migration: cut latency 40%", after.Title);
+        Assert.Equal("work", after.Context);
+        Assert.Contains(after.Skills, s => s.Name == "sql");
+        Assert.Contains(after.Metrics, m => m.Label == "p95: latency" && m.Value == 40);
+        Assert.Contains("[[Payments]]", after.Entities);
+        Assert.Equal("shipped", after.Result);
+    }
+
+    [Fact]
+    public void UpdateExperience_cannot_set_status_to_confirmed()
+    {
+        var res = BankTools.UpdateExperience("b-dash", status: "confirmed");
+        Assert.NotNull(res.Error);
+        Assert.Contains("confirm_experience", res.Error);
+        Assert.Equal("draft", SearchTools.GetExperience("b-dash").Experience!.Status);
     }
 
     [Fact]

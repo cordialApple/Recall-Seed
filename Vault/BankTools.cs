@@ -88,9 +88,9 @@ internal static partial class BankTools
 
         var (writtenId, path, error) = VaultStore.Write(
             slug, title, context, status, beats,
-            (skills ?? []).Where(s => !string.IsNullOrWhiteSpace(s.Name)).ToList(),
+            (skills ?? []).Where(s => s is not null && !string.IsNullOrWhiteSpace(s.Name)).ToList(),
             Clean(tags),
-            (metrics ?? []).Where(m => !string.IsNullOrWhiteSpace(m.Label)).ToList(),
+            (metrics ?? []).Where(m => m is not null && !string.IsNullOrWhiteSpace(m.Label)).ToList(),
             (entities ?? []).Select(NormalizeEntity).Where(e => e.Length > 0).Distinct().ToList(),
             Clean(gaps).ToList());
 
@@ -127,6 +127,11 @@ internal static partial class BankTools
         var (e, findError) = FindById(id);
         if (e is null) return findError!;
 
+        if (title is not null && string.IsNullOrWhiteSpace(title))
+            return new WriteResult(null, Error: "title must not be empty");
+        if (status is not null && status.Trim() == "confirmed")
+            return new WriteResult(null, Error: "use confirm_experience to confirm a note; update_experience cannot set status to confirmed");
+
         var newContext = context is null ? e.Context : context.Trim();
         if (!Contexts.Contains(newContext))
             return new WriteResult(null, Error: $"invalid context '{newContext}'; must be one of: {string.Join(", ", Contexts)}");
@@ -148,9 +153,9 @@ internal static partial class BankTools
 
         var (writtenId, path, error) = VaultStore.Write(
             e.Id, title is null ? e.Title : title.Trim(), newContext, newStatus, beats,
-            skills is null ? e.Skills : skills.Where(s => !string.IsNullOrWhiteSpace(s.Name)).ToList(),
+            skills is null ? e.Skills : skills.Where(s => s is not null && !string.IsNullOrWhiteSpace(s.Name)).ToList(),
             tags is null ? e.Tags : Clean(tags),
-            metrics is null ? e.Metrics : metrics.Where(m => !string.IsNullOrWhiteSpace(m.Label)).ToList(),
+            metrics is null ? e.Metrics : metrics.Where(m => m is not null && !string.IsNullOrWhiteSpace(m.Label)).ToList(),
             entities is null ? e.Entities : entities.Select(NormalizeEntity).Where(x => x.Length > 0).Distinct().ToList(),
             gaps is null ? e.Gaps : Clean(gaps));
 
@@ -163,7 +168,7 @@ internal static partial class BankTools
                  "true. Refuses if the action or result beat is empty or low-confidence, or open gaps " +
                  "remain, and reports exactly what blocks so you know what to fill with update_experience.")]
     public static WriteResult ConfirmExperience(
-        [Description("Id of the draft note to confirm.")] string id)
+        [Description("Id of the note to confirm. A note already confirmed just re-confirms idempotently.")] string id)
     {
         var (e, findError) = FindById(id);
         if (e is null) return findError!;
