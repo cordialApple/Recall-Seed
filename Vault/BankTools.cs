@@ -104,7 +104,8 @@ internal static partial class BankTools
                  "untouched. Per-beat text and confidence, plus skills/tags/metrics/entities/gaps as " +
                  "whole-list replacements (pass the new list; [] clears, omit keeps). Answer a gap by " +
                  "filling the beat it asks about and passing the trimmed gaps list. Grounding holds: " +
-                 "never invent a fact/metric, keep metrics verbatim. Unknown id returns a clean error.")]
+                 "never invent a fact/metric, keep metrics verbatim. Editing a confirmed note's " +
+                 "action/result/gaps returns it to draft (re-confirm after). Unknown id returns a clean error.")]
     public static WriteResult UpdateExperience(
         [Description("Id of the note to patch. From search_experiences, query_experiences, or get_experience.")] string id,
         [Description("New title. Omit to keep the current one.")] string? title = null,
@@ -129,7 +130,7 @@ internal static partial class BankTools
 
         if (title is not null && string.IsNullOrWhiteSpace(title))
             return new WriteResult(null, Error: "title must not be empty");
-        if (status is not null && status.Trim() == "confirmed")
+        if (status is not null && status.Trim().Equals("confirmed", StringComparison.OrdinalIgnoreCase))
             return new WriteResult(null, Error: "use confirm_experience to confirm a note; update_experience cannot set status to confirmed");
 
         var newContext = context is null ? e.Context : context.Trim();
@@ -151,6 +152,11 @@ internal static partial class BankTools
         if (beats.All(b => string.IsNullOrWhiteSpace(b.Item2)))
             return new WriteResult(null, Error: "at least one STAR beat (situation, task, action, result) is required");
 
+        var touchedGate = action is not null || result is not null
+            || actionConfidence is not null || resultConfidence is not null || gaps is not null;
+        var unvouched = newStatus == "confirmed" && touchedGate;
+        if (unvouched) newStatus = "draft";
+
         var (writtenId, path, error) = VaultStore.Write(
             e.Id, title is null ? e.Title : title.Trim(), newContext, newStatus, beats,
             skills is null ? e.Skills : skills.Where(s => s is not null && !string.IsNullOrWhiteSpace(s.Name)).ToList(),
@@ -160,7 +166,9 @@ internal static partial class BankTools
             gaps is null ? e.Gaps : Clean(gaps));
 
         if (error != null) return new WriteResult(null, Error: error);
-        return new WriteResult(writtenId, path, "patched. only the fields you passed changed; the rest is untouched.");
+        return new WriteResult(writtenId, path, unvouched
+            ? "patched. editing a confirmed note's action/result/gaps returned it to draft; re-confirm when ready."
+            : "patched. only the fields you passed changed; the rest is untouched.");
     }
 
     [McpServerTool(Name = "confirm_experience")]

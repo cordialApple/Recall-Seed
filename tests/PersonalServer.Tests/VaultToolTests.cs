@@ -188,6 +188,18 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void UpdateExperience_unvouches_confirmed_note_only_when_gated_content_changes()
+    {
+        Assert.Equal("confirmed", SearchTools.GetExperience("a-mig").Experience!.Status);
+
+        Assert.Null(BankTools.UpdateExperience("a-mig", tags: ["backend", "db"]).Error);
+        Assert.Equal("confirmed", SearchTools.GetExperience("a-mig").Experience!.Status);
+
+        Assert.Null(BankTools.UpdateExperience("a-mig", action: "re-ran the cutover differently").Error);
+        Assert.Equal("draft", SearchTools.GetExperience("a-mig").Experience!.Status);
+    }
+
+    [Fact]
     public void ConfirmExperience_gates_on_gaps_and_thin_beats()
     {
         var blocked = BankTools.ConfirmExperience("b-dash");
