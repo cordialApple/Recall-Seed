@@ -18,12 +18,15 @@
     <!-- Set up the MCP server to be a single file executable -->
     <PublishSingleFile>true</PublishSingleFile>
 
-    <!-- Set recommended package metadata -->
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageId>SampleMcpServer</PackageId>
+    <PackageId>CordialApple.PersonalServer</PackageId>
     <PackageVersion>0.1.0-beta</PackageVersion>
-    <PackageTags>AI; MCP; server; stdio</PackageTags>
-    <Description>An MCP server using the MCP C# SDK.</Description>
+    <PackageTags>AI; MCP; server; stdio; career; resume; obsidian</PackageTags>
+    <Authors>Brandon Randle</Authors>
+    <Description>Vault-native MCP server: turns a markdown career vault into grounded resume bullets, interview answers, tendencies, and expertise, with strict no-fabrication grounding.</Description>
+    <RepositoryUrl>https://github.com/cordialApple/PersonalServer</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/cordialApple/PersonalServer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <!-- The project root is the repo root, so the default **/*.cs glob would otherwise sweep in

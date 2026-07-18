@@ -6,7 +6,7 @@
   "servers": {
     "PersonalServer": {
       "type": "stdio",
-      "command": "C:\\Users\\randl\\AppData\\Local\\PersonalServer\\PersonalServer.exe"
+      "command": "${env:LOCALAPPDATA}\\PersonalServer\\PersonalServer.exe"
     }
   }
 }
