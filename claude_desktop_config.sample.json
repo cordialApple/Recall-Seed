@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "PersonalServer": {
-      "command": "C:\\Users\\randl\\AppData\\Local\\PersonalServer\\PersonalServer.exe"
+      "command": "%LOCALAPPDATA%\\PersonalServer\\PersonalServer.exe"
     }
   }
 }

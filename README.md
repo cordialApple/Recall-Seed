@@ -94,14 +94,17 @@ snapshot, not live source.
    ```
 
    Add the `PersonalServer` entry (see [`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)).
-   Optionally set `EXPERIENCE_VAULT` in its `env` if your vault isn't at `~/Documents/Design_Exp`:
+   `%LOCALAPPDATA%` / `%USERPROFILE%` mark the machine-specific paths to fill in - the publish step
+   above puts the exe at `%LOCALAPPDATA%\PersonalServer\PersonalServer.exe`; use the full literal path
+   if your client doesn't expand environment variables. Optionally set `EXPERIENCE_VAULT` in its `env`
+   if your vault isn't at `~/Documents/Design_Exp`:
 
    ```json
    {
      "mcpServers": {
        "PersonalServer": {
-         "command": "C:\\Users\\randl\\AppData\\Local\\PersonalServer\\PersonalServer.exe",
-         "env": { "EXPERIENCE_VAULT": "C:\\Users\\randl\\Documents\\Design_Exp" }
+         "command": "%LOCALAPPDATA%\\PersonalServer\\PersonalServer.exe",
+         "env": { "EXPERIENCE_VAULT": "%USERPROFILE%\\Documents\\Design_Exp" }
        }
      }
    }
