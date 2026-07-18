@@ -135,7 +135,8 @@ internal static class Prompts
 
         Rules:
         - Ground every claim in the transcript. Do not praise or criticize anything that was never discussed.
-        - Never fabricate a metric, outcome, company, or detail the candidate did not state. Preserve any numbers they stated verbatim; never round or inflate. If a story lacks a result or metric, leave it thin and flag it as an improvement area rather than inventing one.
+        - Never fabricate a metric, outcome, company, or detail the candidate did not state. Preserve any numbers they stated verbatim; never round or inflate.
+        - If the candidate did not state a beat (a situation, task, or result), leave it thin or empty and flag it as an improvement area. Never invent framing to complete the STAR shape - an Action with no stated situation stays that way.
         - If experiences are provided, use them only to attach provenance — which banked experience id a reconstructed story maps to. They do not license adding facts the transcript didn't contain.
         """;
 
