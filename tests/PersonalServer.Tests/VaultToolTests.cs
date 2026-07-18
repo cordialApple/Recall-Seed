@@ -402,6 +402,24 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void DebriefInterview_returns_grounded_prompt_and_wraps_transcript()
+    {
+        var res = DebriefTools.DebriefInterview(
+            "Interviewer: tell me about a hard bug.\nCandidate: i traced a race in the cache layer and fixed it.",
+            ["a-mig"]);
+        Assert.Null(res.Error);
+        Assert.Contains("debrief", res.Instruction, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Never fabricate", res.Instruction);
+        Assert.Contains("Ground every claim", res.Instruction);
+        Assert.Contains("<<<TRANSCRIPT", res.Transcript);
+        Assert.Contains("race in the cache layer", res.Transcript);
+        Assert.Equal("a-mig", Assert.Single(res.Experiences).Id);
+
+        Assert.Empty(DebriefTools.DebriefInterview("Candidate: did stuff").Experiences);
+        Assert.Equal("transcript must not be empty", DebriefTools.DebriefInterview(" ").Error);
+    }
+
+    [Fact]
     public void Tools_report_missing_vault()
     {
         Environment.SetEnvironmentVariable(VaultStore.EnvVar, Path.Combine(_vault, "does-not-exist"));

@@ -60,10 +60,7 @@ internal static class StoryTools
 
         var blocks = items
             .Where(e => wanted.Contains(e.Id))
-            .Select(e => new ExperienceBlock(
-                e.Id, e.Title, e.Context,
-                e.Situation, e.Task, e.Action, e.Result,
-                e.Metrics, e.Skills.Select(s => s.Name).ToList()))
+            .Select(ExperienceBlock.From)
             .ToList();
 
         if (blocks.Count == 0) return Fail("no experiences matched the provided ids");
