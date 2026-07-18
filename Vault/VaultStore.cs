@@ -154,7 +154,7 @@ internal static partial class VaultStore
         var sb = new StringBuilder();
         sb.Append("---\n");
         sb.Append("id: ").Append(id).Append('\n');
-        sb.Append("title: ").Append(title).Append('\n');
+        sb.Append("title: ").Append(Q(title)).Append('\n');
         sb.Append("context: ").Append(context).Append('\n');
         sb.Append("status: ").Append(status).Append('\n');
         sb.Append("confidence:\n");
@@ -162,8 +162,8 @@ internal static partial class VaultStore
             sb.Append("  ").Append(beat).Append(": ").Append(conf).Append('\n');
         sb.Append("skills:\n");
         foreach (var s in skills)
-            sb.Append("  - name: ").Append(s.Name).Append("\n    kind: ").Append(s.Kind).Append('\n');
-        sb.Append("tags: [").Append(string.Join(", ", tags)).Append("]\n");
+            sb.Append("  - name: ").Append(Q(s.Name)).Append("\n    kind: ").Append(Q(s.Kind)).Append('\n');
+        sb.Append("tags: [").Append(string.Join(", ", tags.Select(Q))).Append("]\n");
         sb.Append("metrics:");
         if (metrics.Count == 0) sb.Append(" []\n");
         else
@@ -171,12 +171,12 @@ internal static partial class VaultStore
             sb.Append('\n');
             foreach (var m in metrics)
             {
-                sb.Append("  - label: ").Append(m.Label).Append('\n');
+                sb.Append("  - label: ").Append(Q(m.Label)).Append('\n');
                 if (m.Value is { } v) sb.Append("    value: ").Append(v.ToString(CultureInfo.InvariantCulture)).Append('\n');
-                if (!string.IsNullOrWhiteSpace(m.Unit)) sb.Append("    unit: ").Append(m.Unit).Append('\n');
+                if (!string.IsNullOrWhiteSpace(m.Unit)) sb.Append("    unit: ").Append(Q(m.Unit)).Append('\n');
             }
         }
-        sb.Append("entities: [").Append(string.Join(", ", entities.Select(e => "\"" + e + "\""))).Append("]\n");
+        sb.Append("entities: [").Append(string.Join(", ", entities.Select(Q))).Append("]\n");
         sb.Append("---\n\n");
 
         foreach (var (beat, text, _) in beats)
@@ -194,6 +194,9 @@ internal static partial class VaultStore
     }
 
     static string Cap(string s) => s.Length == 0 ? s : char.ToUpperInvariant(s[0]) + s[1..];
+
+    static string Q(string? s)
+        => "\"" + (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", " ").Replace("\n", " ") + "\"";
 
     [GeneratedRegex(@"\A---\r?\n(?<front>.*?)\r?\n---\r?\n?", RegexOptions.Singleline)]
     private static partial Regex FrontmatterRx();

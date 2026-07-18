@@ -36,6 +36,8 @@ See [`Vault/README.md`](Vault/README.md) for the full rationale.
 | `ping` | health check — echoes a message + UTC time |
 | `bank_experience` | grounded extractor (notes/resume/evidence) + entity prompt + STAR schema + known entities |
 | `write_experience` | commit a grounded STAR note to `experiences/`, metrics verbatim, entities as `[[wikilinks]]` |
+| `update_experience` | patch a note by id; only the fields you pass change. answer a gap by filling its beat and passing the trimmed gaps list |
+| `confirm_experience` | flip `draft -> confirmed` by id; refuses and reports why if action/result is thin or gaps remain |
 | `search_experiences` | free-text search over the vault, ranked, with snippets |
 | `query_experiences` | structured filter by skills / tags / context / status |
 | `get_experience` | fetch one full note by id |

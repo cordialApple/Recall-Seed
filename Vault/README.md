@@ -26,6 +26,8 @@ grounded prompt + the real corpus/aggregates and hands them back; the agent exec
 |---|---|
 | `bank_experience` | returns the matching grounded extractor (notes/resume/evidence) + entity prompt + STAR schema + write rules + known vault entities |
 | `write_experience` | commits a grounded STAR note to `experiences/` (frontmatter + beats + gap todos), metrics verbatim, entities as `[[wikilinks]]` |
+| `update_experience` | patches a note by id; only the fields you pass change (per-beat text/confidence, skills/tags/metrics/entities/gaps as list replacements). answer a gap by filling its beat and passing the trimmed gaps list |
+| `confirm_experience` | flips `draft -> confirmed` by id; refuses (and reports why) if action/result is empty or low-confidence or gaps remain |
 | `search_experiences` | free-text search over the vault (title/beats/tags/skills/entities), ranked, with snippets |
 | `query_experiences` | structured filter by skills / tags / context / status → experience cards |
 | `get_experience` | fetch one full note by id (frontmatter + beats + metrics + entities + gaps) |

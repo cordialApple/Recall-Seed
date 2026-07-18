@@ -122,7 +122,7 @@ public class VaultToolTests : IDisposable
         Assert.True(File.Exists(res.Path));
 
         var file = File.ReadAllText(res.Path!);
-        Assert.Contains("label: p95 latency", file);
+        Assert.Contains("label: \"p95 latency\"", file);
         Assert.Contains("value: 40", file);
         Assert.Contains("[[Redis]]", file);
 
@@ -135,6 +135,99 @@ public class VaultToolTests : IDisposable
         Assert.Equal("title must not be empty", BankTools.WriteExperience(null, "  ").Error);
         Assert.Contains("at least one STAR beat", BankTools.WriteExperience("id", "T").Error);
         Assert.Contains("invalid context", BankTools.WriteExperience("id", "T", action: "did", context: "nope").Error);
+    }
+
+    [Fact]
+    public void UpdateExperience_patches_only_given_fields()
+    {
+        var before = SearchTools.GetExperience("a-mig").Experience!;
+
+        var res = BankTools.UpdateExperience("a-mig",
+            result: "zero downtime, 2M users unaffected", resultConfidence: "high",
+            metrics: [new VaultMetric("users unaffected", 2, "M"), new VaultMetric("downtime", 0, "min")]);
+        Assert.Null(res.Error);
+
+        var after = SearchTools.GetExperience("a-mig").Experience!;
+        Assert.Equal("zero downtime, 2M users unaffected", after.Result);
+        Assert.Equal(before.Action, after.Action);
+        Assert.Equal(before.Title, after.Title);
+        Assert.Equal("high", after.Confidence["result"]);
+        Assert.Contains(after.Metrics, m => m.Label == "users unaffected" && m.Value == 2);
+
+        Assert.Contains("no experience with id", BankTools.UpdateExperience("ghost", title: "x").Error);
+        Assert.Contains("title must not be empty", BankTools.UpdateExperience("a-mig", title: "  ").Error);
+    }
+
+    [Fact]
+    public void UpdateExperience_preserves_fields_when_a_value_holds_yaml_specials()
+    {
+        BankTools.WriteExperience(id: "colon", title: "Migration: cut latency 40%",
+            action: "did it", actionConfidence: "high", context: "work",
+            skills: [new VaultSkill("sql", "technical")],
+            metrics: [new VaultMetric("p95: latency", 40, "ms")],
+            entities: ["Payments"], status: "draft");
+
+        Assert.Null(BankTools.UpdateExperience("colon", result: "shipped").Error);
+
+        var after = SearchTools.GetExperience("colon").Experience!;
+        Assert.Equal("Migration: cut latency 40%", after.Title);
+        Assert.Equal("work", after.Context);
+        Assert.Contains(after.Skills, s => s.Name == "sql");
+        Assert.Contains(after.Metrics, m => m.Label == "p95: latency" && m.Value == 40);
+        Assert.Contains("[[Payments]]", after.Entities);
+        Assert.Equal("shipped", after.Result);
+    }
+
+    [Fact]
+    public void UpdateExperience_cannot_set_status_to_confirmed()
+    {
+        var res = BankTools.UpdateExperience("b-dash", status: "confirmed");
+        Assert.NotNull(res.Error);
+        Assert.Contains("confirm_experience", res.Error);
+        Assert.Equal("draft", SearchTools.GetExperience("b-dash").Experience!.Status);
+    }
+
+    [Fact]
+    public void UpdateExperience_unvouches_confirmed_note_only_when_gated_content_changes()
+    {
+        Assert.Equal("confirmed", SearchTools.GetExperience("a-mig").Experience!.Status);
+
+        Assert.Null(BankTools.UpdateExperience("a-mig", tags: ["backend", "db"]).Error);
+        Assert.Equal("confirmed", SearchTools.GetExperience("a-mig").Experience!.Status);
+
+        Assert.Null(BankTools.UpdateExperience("a-mig", action: "re-ran the cutover differently").Error);
+        Assert.Equal("draft", SearchTools.GetExperience("a-mig").Experience!.Status);
+    }
+
+    [Fact]
+    public void ConfirmExperience_gates_on_gaps_and_thin_beats()
+    {
+        var blocked = BankTools.ConfirmExperience("b-dash");
+        Assert.NotNull(blocked.Error);
+        Assert.Contains("cannot confirm", blocked.Error);
+
+        BankTools.WriteExperience(id: "clean", title: "Clean one",
+            action: "did the thing", result: "it worked well",
+            actionConfidence: "high", resultConfidence: "high", context: "work", status: "draft");
+        var ok = BankTools.ConfirmExperience("clean");
+        Assert.Null(ok.Error);
+        Assert.Equal("confirmed", SearchTools.GetExperience("clean").Experience!.Status);
+
+        Assert.Contains("no experience with id", BankTools.ConfirmExperience("ghost").Error);
+    }
+
+    [Fact]
+    public void UpdateExperience_then_confirm_completes_the_loop()
+    {
+        var upd = BankTools.UpdateExperience("b-dash",
+            situation: "team had no adoption visibility", situationConfidence: "medium",
+            result: "dashboard adopted by the whole team", resultConfidence: "high",
+            gaps: []);
+        Assert.Null(upd.Error);
+
+        var confirmed = BankTools.ConfirmExperience("b-dash");
+        Assert.Null(confirmed.Error);
+        Assert.Equal("confirmed", SearchTools.GetExperience("b-dash").Experience!.Status);
     }
 
     [Fact]
