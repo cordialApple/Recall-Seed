@@ -26,10 +26,7 @@ internal static class ResumeTools
 
         var blocks = items
             .OrderByDescending(e => e.UpdatedUtc)
-            .Select(e => new ExperienceBlock(
-                e.Id, e.Title, e.Context,
-                e.Situation, e.Task, e.Action, e.Result,
-                e.Metrics, e.Skills.Select(s => s.Name).ToList()))
+            .Select(ExperienceBlock.From)
             .ToList();
 
         return new TailorResult(Prompts.Bullets, jd, blocks);

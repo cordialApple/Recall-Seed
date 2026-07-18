@@ -59,7 +59,13 @@ public record ExperienceBlock(
     string Action,
     string Result,
     IReadOnlyList<VaultMetric> Metrics,
-    IReadOnlyList<string> Skills);
+    IReadOnlyList<string> Skills)
+{
+    public static ExperienceBlock From(Experience e) => new(
+        e.Id, e.Title, e.Context,
+        e.Situation, e.Task, e.Action, e.Result,
+        e.Metrics, e.Skills.Select(s => s.Name).ToList());
+}
 
 public record TailorResult(
     string Instruction,
@@ -74,6 +80,12 @@ public record StoryResult(
     string Directive = "",
     string Kind = "genre",
     string? Target = null,
+    string? Error = null);
+
+public record DebriefResult(
+    string Instruction,
+    string Transcript,
+    IReadOnlyList<ExperienceBlock> Experiences,
     string? Error = null);
 
 public record TendencyStats(
