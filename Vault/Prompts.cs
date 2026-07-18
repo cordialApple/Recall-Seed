@@ -94,7 +94,7 @@ internal static class Prompts
         - Build the answer ONLY from the provided experiences. Never invent a fact, number, company, outcome, or detail that isn't in them. A fabricated story is worse than a thin one. Preserve metrics verbatim, never round or inflate.
         - If the answer would benefit from something the experiences don't contain (a metric, a result), do NOT make it up. Mark the gap inline in square brackets, e.g. "[add a metric here]" or "[what was the outcome?]", so the person can fill it in.
         - Structure it as a natural STAR arc (situation -> task -> action -> result), but spoken and flowing, not labeled sections. First person, past tense.
-        - Match the requested length and tone from the directive. Give just enough context to land, spend the most time on the action, end on the result.
+        - Match the requested length and tone from the directive. Give just enough context to land, spend the most time on the action, end on the result. If the experiences run out before the target length, fall short rather than pad to a word count with invented specifics.
         - Stay honest about thin beats: if the source has no quantified result, don't manufacture one to make it land better. A truthful smaller claim beats an invented big one.
         - If several experiences are given, weave them only if they genuinely support one coherent story; otherwise center the single most relevant one.
         - The answer traces back to the provided experience id(s) and nothing else.

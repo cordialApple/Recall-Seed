@@ -72,7 +72,7 @@ internal static class StoryTools
             ? "Tailor the answer to what the target job description values, staying grounded in the provided experiences."
             : trimmedTarget is null
                 ? "Give a general behavioral answer from the provided experiences."
-                : "Answer the target interview theme, weaving the experiences that best fit it.";
+                : "Answer the target interview theme, weaving the experiences that best fit it, staying grounded in them.";
 
         var directive = $"Length: {LengthSpec[length]}. Tone: {ToneSpec[tone]}. {frame}";
 
