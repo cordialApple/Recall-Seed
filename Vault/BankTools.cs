@@ -62,7 +62,7 @@ internal static partial class BankTools
         [Description("Metrics, each { label, value?, unit? } — verbatim from the source, never invented.")] VaultMetric[]? metrics = null,
         [Description("Named entities as [[wikilink]] targets or bare names (people/teams/projects/orgs/tools).")] string[]? entities = null,
         [Description("Gap questions for thin/absent beats — the person answers these to confirm the draft.")] string[]? gaps = null,
-        [Description("Status: draft or confirmed (default draft).")] string status = "draft")
+        [Description("Status: draft (default). To confirm a note, use confirm_experience — write creates drafts.")] string status = "draft")
     {
         if (string.IsNullOrWhiteSpace(title))
             return new WriteResult(null, Error: "title must not be empty");
@@ -73,6 +73,8 @@ internal static partial class BankTools
             return new WriteResult(null, Error: $"invalid context '{context}'; must be one of: {string.Join(", ", Contexts)}");
         if (!Statuses.Contains(status))
             return new WriteResult(null, Error: $"invalid status '{status}'; must be one of: {string.Join(", ", Statuses)}");
+        if (status.Trim().Equals("confirmed", StringComparison.OrdinalIgnoreCase))
+            return new WriteResult(null, Error: "use confirm_experience to confirm a note; write_experience creates drafts");
 
         var slug = string.IsNullOrWhiteSpace(id) ? Slug(title) : Slug(id!);
         if (slug.Length == 0)
