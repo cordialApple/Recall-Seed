@@ -24,8 +24,9 @@ trustworthy:
   (`confirm_experience`) is refused while its action/result is thin or open gaps remain — and
   `write_experience` won't mint a `confirmed` note either, so confirmed status is only ever earned
   through that gate.
-- **ensureCited** — every interview question must cite a real corpus chunk, hard-enforced by
-  `check_citation`.
+- **ensureCited** — every *non-terminal* interview question must cite ≥1 real corpus `chunk_id`; a
+  question that can't be tied to one is out of bounds. `check_citation` is the guard that verifies the
+  cited ids are real before the question is asked.
 
 The LLM runs in the *calling* agent; each tool assembles the grounded prompt plus the real
 corpus/aggregates and hands them back. The server retrieves and captures — it does not author.
