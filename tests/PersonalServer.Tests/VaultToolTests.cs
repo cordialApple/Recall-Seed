@@ -188,6 +188,15 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void WriteExperience_cannot_create_a_confirmed_note()
+    {
+        var res = BankTools.WriteExperience(id: "born-confirmed", title: "T", action: "did", status: "confirmed");
+        Assert.NotNull(res.Error);
+        Assert.Contains("confirm_experience", res.Error);
+        Assert.Null(SearchTools.GetExperience("born-confirmed").Experience);
+    }
+
+    [Fact]
     public void UpdateExperience_unvouches_confirmed_note_only_when_gated_content_changes()
     {
         Assert.Equal("confirmed", SearchTools.GetExperience("a-mig").Experience!.Status);
