@@ -15,7 +15,7 @@ internal static class ExpertiseTools
                  "preserve metrics verbatim, and be honest about thinly-evidenced skills.")]
     public static ExpertiseResult ExpertiseProfile()
     {
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new ExpertiseResult(Prompts.Expertise, [], [], [], error);
         if (items.Count == 0)
             return new ExpertiseResult(Prompts.Expertise, [], [], [], "the vault has no experiences yet; bank some first");

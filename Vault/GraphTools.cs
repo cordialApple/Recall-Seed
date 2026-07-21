@@ -18,7 +18,7 @@ internal static class GraphTools
         if (string.IsNullOrWhiteSpace(experienceId))
             return new NeighborsResult([], [], "experienceId must not be empty");
 
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new NeighborsResult([], [], error);
 
         var target = items.FirstOrDefault(e => e.Id.Equals(experienceId.Trim(), StringComparison.OrdinalIgnoreCase));

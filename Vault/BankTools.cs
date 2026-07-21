@@ -36,7 +36,7 @@ internal static partial class BankTools
         };
 
         return new BankResult(kind, instruction, Prompts.Entity, Prompts.OutputSchema,
-            Prompts.WriteRules, VaultStore.KnownEntities(), input);
+            Prompts.WriteRules, ExperienceStore.Current.KnownEntities(), input);
     }
 
     [McpServerTool(Name = "write_experience")]
@@ -88,7 +88,7 @@ internal static partial class BankTools
             ("result", result ?? "", Conf(resultConfidence)),
         };
 
-        var (writtenId, path, error) = VaultStore.Write(
+        var (writtenId, path, error) = ExperienceStore.Current.Write(
             slug, title, context, status, beats,
             (skills ?? []).Where(s => s is not null && !string.IsNullOrWhiteSpace(s.Name)).ToList(),
             Clean(tags),
@@ -159,7 +159,7 @@ internal static partial class BankTools
         var unvouched = newStatus == "confirmed" && touchedGate;
         if (unvouched) newStatus = "draft";
 
-        var (writtenId, path, error) = VaultStore.Write(
+        var (writtenId, path, error) = ExperienceStore.Current.Write(
             e.Id, title is null ? e.Title : title.Trim(), newContext, newStatus, beats,
             skills is null ? e.Skills : skills.Where(s => s is not null && !string.IsNullOrWhiteSpace(s.Name)).ToList(),
             tags is null ? e.Tags : Clean(tags),
@@ -195,7 +195,7 @@ internal static partial class BankTools
             return new WriteResult(null, Error: "cannot confirm: " + string.Join(" | ", blockers));
 
         var beats = e.Beats.Select(b => (b.Beat, b.Text, e.Confidence.GetValueOrDefault(b.Beat, "low"))).ToArray();
-        var (writtenId, path, error) = VaultStore.Write(
+        var (writtenId, path, error) = ExperienceStore.Current.Write(
             e.Id, e.Title, e.Context, "confirmed", beats,
             e.Skills, e.Tags, e.Metrics, e.Entities, e.Gaps);
 
@@ -208,7 +208,7 @@ internal static partial class BankTools
         if (string.IsNullOrWhiteSpace(id))
             return (null, new WriteResult(null, Error: "id must not be empty"));
 
-        var (items, loadError) = VaultStore.LoadAll();
+        var (items, loadError) = ExperienceStore.Current.LoadAll();
         if (loadError != null) return (null, new WriteResult(null, Error: loadError));
 
         var e = items.FirstOrDefault(x => x.Id.Equals(id.Trim(), StringComparison.OrdinalIgnoreCase));

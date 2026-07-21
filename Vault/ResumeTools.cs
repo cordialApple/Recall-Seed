@@ -19,7 +19,7 @@ internal static class ResumeTools
         if (string.IsNullOrWhiteSpace(jd))
             return new TailorResult(Prompts.Bullets, "", [], "jd must not be empty");
 
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new TailorResult(Prompts.Bullets, jd, [], error);
         if (items.Count == 0)
             return new TailorResult(Prompts.Bullets, jd, [], "the vault has no experiences yet; bank some first");

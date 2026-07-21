@@ -52,7 +52,7 @@ internal static class StoryTools
         var trimmedTarget = string.IsNullOrWhiteSpace(target) ? null : target.Trim();
         if (kind == "jd" && trimmedTarget is null) return Fail("kind 'jd' needs a target job description");
 
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return Fail(error);
 
         var wanted = new HashSet<string>(experienceIds.Where(id => !string.IsNullOrWhiteSpace(id)).Select(id => id.Trim()),

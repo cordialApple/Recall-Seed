@@ -15,7 +15,7 @@ internal static class TendencyTools
                  "are unquantified) without inventing or adjusting any number.")]
     public static TendencyResult FindTendencies()
     {
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new TendencyResult(Prompts.Tendencies, Empty(), error);
         if (items.Count == 0)
             return new TendencyResult(Prompts.Tendencies, Empty(), "the vault has no experiences yet; bank some first");
