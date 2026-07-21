@@ -1,33 +1,56 @@
 # PersonalServer
 
-A [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server written in C# on
-**.NET 10**, using the official [`ModelContextProtocol`](https://www.nuget.org/packages/ModelContextProtocol)
-SDK. It is a **career-experience harness**: tools over an Obsidian-style markdown vault that bank
-grounded STAR notes, tailor resume bullets, surface tendencies in how you work, profile your
-provable expertise, and run a defend-your-own-repo mock interview. Built for the **Claude Desktop**
-client.
+**A grounded career-experience harness, delivered as an MCP server.** It turns a plain
+Obsidian-style markdown vault of your work into JD-tailored resume bullets, spoken interview answers,
+cross-vault tendencies, and an evidence-weighted expertise profile — and its whole reason to exist is
+that it **never fabricates**. Every metric is verbatim from your notes, every claim traces to a source
+id, and it will *refuse to vouch a thin story rather than invent one*.
 
-It speaks **stdio only** — a Generic Host app that exchanges JSON-RPC over stdin/stdout. `stdout`
-is reserved for the protocol; **all logging goes to stderr**.
+Written in C# on **.NET 10** using the official
+[`ModelContextProtocol`](https://www.nuget.org/packages/ModelContextProtocol) SDK; built for
+[Model Context Protocol](https://modelcontextprotocol.io/) clients like **Claude Desktop**.
 
-> **How an MCP stdio server runs:** it is *not* a daemon and you never start it yourself. The
-> client (Claude Desktop) launches the server as a child process on demand and talks to it over
-> stdio. So "always available" just means the client can spawn it instantly — which is why we
-> publish a fast, self-contained `.exe` and point Claude Desktop at it (no `dotnet run`, no SDK
-> needed at launch). A Windows service is *not* used: a detached service has no stdio pipe for a
-> client to attach to.
+> **See [`docs/PROOF.md`](docs/PROOF.md)** — redacted real runs against a live vault: a grounded STAR,
+> resume bullets each tagged with their source `experience_id`, real `find_tendencies` counts, and the
+> keystone — a thin note that yields a gap question, **not an invented metric**.
+
+## The moat: grounding + ensureCited
+
+Two disciplines, embedded verbatim in [`Vault/Prompts.cs`](Vault/Prompts.cs), make the output
+trustworthy:
+
+- **Grounding** — never invent a fact, number, or outcome. An absent beat stays thin, low-confidence,
+  and carries a *gap question*; metrics are copied verbatim. Vouching a note as true
+  (`confirm_experience`) is refused while its action/result is thin or open gaps remain — and
+  `write_experience` won't mint a `confirmed` note either, so confirmed status is only ever earned
+  through that gate.
+- **ensureCited** — every interview question must cite a real corpus chunk, hard-enforced by
+  `check_citation`.
+
+The LLM runs in the *calling* agent; each tool assembles the grounded prompt plus the real
+corpus/aggregates and hands them back. The server retrieves and captures — it does not author.
+
+## Lineage: the STARfolio successor
+
+PersonalServer is the durable core of **STARfolio**, a private single-user Electron desktop app for
+banking accomplishments in STAR form (Situation/Task/Action/Result). STARfolio's realtime surface —
+live voice interview, ASR, token-streaming — is app-only and stays there. Its *portable* IP, the
+grounded prompts and the defend-your-own-repo interview, was extracted and coalesced into this MCP
+server over a plain markdown vault, so the moat lives in code you can read rather than a frozen app.
+STARfolio is now a **sibling to complement, not a backend**.
 
 ## The vault is the substrate
 
-One experience = one markdown file under `experiences/`; `[[wikilinks]]` + backlinks are the
-knowledge graph for free. No database. The vault location is the `EXPERIENCE_VAULT` env var, else
-`~/Documents/Design_Exp`. Two disciplines make the output trustworthy and live verbatim in
-`Vault/Prompts.cs`: **grounding** (never invent a fact/number/outcome; absent beats stay thin +
-low-confidence + a gap question; metrics verbatim) and **ensureCited** (every interview question
-cites a real corpus chunk — enforced by `check_citation`). The LLM runs in the calling agent; each
-tool assembles the grounded prompt + the real corpus/aggregates and hands them back.
+One experience = one markdown file under `experiences/`; `[[wikilinks]]` + backlinks are the knowledge
+graph for free. No database. The vault location resolves from the `EXPERIENCE_VAULT` environment
+variable, else `~/Documents/Design_Exp`. A missing vault returns a structured error naming the resolved
+path, not a crash. See [`Vault/README.md`](Vault/README.md) for the full rationale.
 
-See [`Vault/README.md`](Vault/README.md) for the full rationale.
+> **How an MCP stdio server runs:** it is *not* a daemon and you never start it yourself. The client
+> (e.g. Claude Desktop) launches the server as a child process on demand and talks to it over stdio.
+> `stdout` is reserved for the JSON-RPC protocol; **all logging goes to stderr**. "Always available"
+> just means the client can spawn it instantly — which is why we publish a fast, self-contained binary
+> and point the client at it (no `dotnet run`, no SDK needed at launch).
 
 ## Tools
 
@@ -35,7 +58,7 @@ See [`Vault/README.md`](Vault/README.md) for the full rationale.
 |---|---|
 | `ping` | health check — echoes a message + UTC time |
 | `bank_experience` | grounded extractor (notes/resume/evidence) + entity prompt + STAR schema + known entities |
-| `write_experience` | commit a grounded STAR note to `experiences/`, metrics verbatim, entities as `[[wikilinks]]` |
+| `write_experience` | commit a grounded STAR note to `experiences/`, metrics verbatim, entities as `[[wikilinks]]` (creates drafts) |
 | `update_experience` | patch a note by id; only the fields you pass change. answer a gap by filling its beat and passing the trimmed gaps list |
 | `confirm_experience` | flip `draft -> confirmed` by id; refuses and reports why if action/result is thin or gaps remain |
 | `search_experiences` | free-text search over the vault, ranked, with snippets |
@@ -51,8 +74,8 @@ See [`Vault/README.md`](Vault/README.md) for the full rationale.
 | `check_citation` | hard guard — are these chunk_ids real? |
 | `voice_guide` | voice rules + recent notes as fresh style samples |
 
-Tools are auto-discovered via `[McpServerToolType]` + `WithToolsFromAssembly()`, so adding one is
-just a new annotated class — no `Program.cs` change.
+Tools are auto-discovered via `[McpServerToolType]` + `WithToolsFromAssembly()`, so adding one is just
+a new annotated class — no `Program.cs` change.
 
 ## Layout
 
@@ -61,82 +84,84 @@ PersonalServer.csproj             # net10.0 console app, self-contained single-f
 Program.cs                        # Generic Host: stdio transport + WithToolsFromAssembly()
 Tools/PingTools.cs                # the `ping` health-check tool
 Vault/                            # the career harness — prompts, vault store, and all tools
-claude_desktop_config.sample.json # reference snippet for Claude Desktop's config
+claude_desktop_config.sample.json # reference snippet for an MCP client's config
 scripts/smoke-ping.ps1            # non-interactive end-to-end smoke test
 tests/PersonalServer.Tests/       # xunit tests over a temp vault
+docs/PROOF.md                     # redacted real runs (the proof)
 ```
 
 ## Build & publish
 
-Published as a **self-contained, single-file exe** (no .NET runtime required on the target) to a
-stable location outside the repo, so the artifact survives `dotnet clean` and repo moves:
+Published as a **self-contained, single-file binary** (no .NET runtime required on the target). The
+csproj declares runtime identifiers for Windows, macOS, and Linux
+(`win-x64; win-arm64; osx-arm64; linux-x64; linux-arm64; linux-musl-x64`) — publish for yours:
 
-```powershell
-dotnet publish -c Release -r win-x64 -o "$env:LOCALAPPDATA\PersonalServer"
-# -> %LOCALAPPDATA%\PersonalServer\PersonalServer.exe
+```bash
+# Windows (PowerShell)
+dotnet publish -c Release -r win-x64   -o "$env:LOCALAPPDATA\PersonalServer"
+# macOS (Apple silicon)
+dotnet publish -c Release -r osx-arm64 -o ~/.local/share/PersonalServer
+# Linux
+dotnet publish -c Release -r linux-x64 -o ~/.local/share/PersonalServer
 ```
 
-Re-run this after **any** code change, then fully restart Claude Desktop — the running exe is a
-snapshot, not live source.
+This drops a single `PersonalServer` binary (`.exe` on Windows) at a stable location outside the repo,
+so the artifact survives `dotnet clean` and repo moves. Re-run after **any** code change, then fully
+restart your MCP client — the built binary is a snapshot, not live source.
 
-## Use it from Claude Desktop
+## Use it from an MCP client (e.g. Claude Desktop)
 
-1. **Publish** the exe (above).
-2. **Edit Claude Desktop's config** at:
+1. **Publish** the binary (above).
+2. **Point the client's MCP config at it.** Claude Desktop's config lives at:
 
    ```
-   # Microsoft Store / packaged (MSIX) install — what THIS machine uses.
-   # Packaged apps virtualize AppData, so they do NOT read %APPDATA%\Claude\.
-   %LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json
-
-   # Standalone (non-Store) install would instead use:
-   %APPDATA%\Claude\claude_desktop_config.json
+   Windows (standalone):        %APPDATA%\Claude\claude_desktop_config.json
+   Windows (Microsoft Store):   %LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json
+   macOS:                       ~/Library/Application Support/Claude/claude_desktop_config.json
    ```
 
    Add the `PersonalServer` entry (see [`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)).
-   `%LOCALAPPDATA%` / `%USERPROFILE%` mark the machine-specific paths to fill in - the publish step
-   above puts the exe at `%LOCALAPPDATA%\PersonalServer\PersonalServer.exe`; use the full literal path
-   if your client doesn't expand environment variables. Optionally set `EXPERIENCE_VAULT` in its `env`
-   if your vault isn't at `~/Documents/Design_Exp`:
+   Use the **full literal path** to the binary if your client doesn't expand environment variables. Set
+   `EXPERIENCE_VAULT` in its `env` if your vault isn't at `~/Documents/Design_Exp`:
 
    ```json
    {
      "mcpServers": {
        "PersonalServer": {
-         "command": "%LOCALAPPDATA%\\PersonalServer\\PersonalServer.exe",
-         "env": { "EXPERIENCE_VAULT": "%USERPROFILE%\\Documents\\Design_Exp" }
+         "command": "/absolute/path/to/PersonalServer",
+         "env": { "EXPERIENCE_VAULT": "/absolute/path/to/your/vault" }
        }
      }
    }
    ```
 
-3. **Fully restart Claude Desktop.** Closing the window isn't enough — quit it from the system tray
-   (right-click → Quit) and relaunch, so it reloads the config and spawns the server.
+3. **Fully restart the client** so it reloads the config and spawns the server (on a tray app, quit
+   from the tray — closing the window isn't enough).
 4. **Verify:** confirm the tools are listed, then try `find_tendencies` — it reports real counts off
    your vault.
 
-> **Editing the config on the Store build:** quit Claude Desktop *completely* first (tray → Quit,
-> confirm no `Claude.exe` remain). The packaged app rewrites `claude_desktop_config.json` on
-> preference changes and will clobber edits made while it's running. Troubleshooting logs live next
-> to the config: `…\LocalCache\Roaming\Claude\logs\mcp-server-PersonalServer.log`.
+> **Windows Store (MSIX) build of Claude Desktop:** packaged apps virtualize AppData, so they do **not**
+> read `%APPDATA%\Claude\`. Edit the `LocalCache` path above, and quit Claude Desktop *completely* first
+> (tray → Quit) — the packaged app rewrites its config on preference changes and will clobber edits made
+> while it's running. Troubleshooting logs live next to the config: `…\Roaming\Claude\logs\mcp-server-PersonalServer.log`.
 
 ## Other ways to run / test
 
 - **Smoke test (no client needed):**
   ```powershell
-  powershell -File scripts\smoke-ping.ps1
+  powershell -File scripts/smoke-ping.ps1
   ```
-  Builds the project, drives the server over stdio (`initialize` → `tools/list` → `tools/call
-  ping`), prints the raw JSON-RPC, and asserts `ping`/`pong`.
+  Builds the project, drives the server over stdio (`initialize` → `tools/list` → `tools/call ping`),
+  prints the raw JSON-RPC, and asserts `ping`/`pong`.
 
 - **Full test suite:**
-  ```powershell
-  dotnet test tests\PersonalServer.Tests
+  ```bash
+  dotnet test tests/PersonalServer.Tests
   ```
 
 - **MCP Inspector (interactive):**
-  ```powershell
-  npx @modelcontextprotocol/inspector "$env:LOCALAPPDATA\PersonalServer\PersonalServer.exe"
+  ```bash
+  npx @modelcontextprotocol/inspector /path/to/PersonalServer
   ```
 
 ## License
