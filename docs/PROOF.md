@@ -102,28 +102,44 @@ tokens redacted in prose and in the id-slugs):
   Engineering. — `experience_id: 2025-11-[university]-coe-elt-warehouse`
 
 Every bullet traces back to one note; every number appears in that note's `metrics`. To make that
-checkable in-doc, here is the verbatim `metrics` array `expertise_profile` returned for the first id
-(employer redacted, numbers untouched):
+checkable in-doc, here are the verbatim `metrics` arrays `expertise_profile` returned for all three
+cited ids (employer/institution redacted, numbers untouched):
 
 ```json
-"metrics": [
-  { "label": "per-image context cost, before pipeline", "value": 1000000, "unit": "tokens (over)" },
+// 2026-06-[employer]-helpdesk-mcp
+[ { "label": "per-image context cost, before pipeline", "value": 1000000, "unit": "tokens (over)" },
   { "label": "per-MB image cost, before pipeline",       "value": 1.17,    "unit": "USD/MB (approx)" },
   { "label": "taxonomy values grounded against",         "value": 200,     "unit": "values (200+)" },
-  { "label": "upload size limit",                        "value": 50,      "unit": "MB" }
-]
+  { "label": "upload size limit",                        "value": 50,      "unit": "MB" } ]
+// 2025-06-emergency-management-flood-etl
+[ { "label": "years of flood reports analyzed", "value": 24,      "unit": "years" },
+  { "label": "WebEOC dashboards deployed",       "value": 13,      "unit": "dashboards (13+)" },
+  { "label": "waterworks project informed",      "value": 3000000, "unit": "USD" } ]
+// 2025-11-[university]-coe-elt-warehouse
+[ { "label": "legacy mainframe records", "value": 200000, "unit": "records (approx)" },
+  { "label": "semesters spanned",        "value": 20,     "unit": "semesters" } ]
 ```
 
-Nothing in the bullets was invented — it was selected and tailored from grounded blocks, numbers intact.
+Every number in the three bullets (200+, >1,000,000, 50 MB · 24 years, $3M, 13+ · ~200,000, 20
+semesters) appears above. Nothing was invented — bullets were selected and tailored from grounded
+blocks, numbers intact.
 
 ---
 
 ## 4. Refusal to fabricate — `write_experience` → `confirm_experience`
 
 The keystone. `write_experience` banks a **draft**; `confirm_experience` is the vouch step — the
-person asserting the draft is true — and confirmed status is only reachable through it. A deliberately
-thin note is banked (a vague situation, no action or result, one gap), then vouching is attempted.
-This ran against a throwaway temp vault (never the real one).
+person asserting the draft is true — and confirmed status is only reachable through it. Both write
+tools refuse a direct `status: confirmed` (they hand you back to the vouch gate), so a note can only
+become confirmed by passing the gap/beat-completeness check below:
+
+```json
+// write_experience(..., status: "confirmed")  ->
+{ "error": "use confirm_experience to confirm a note; write_experience creates drafts" }
+```
+
+A deliberately thin note is then banked (a vague situation, no action or result, one gap), and
+vouching is attempted. This ran against a throwaway temp vault (never the real one).
 
 The note exactly as `write_experience` wrote it to disk (verbatim; note `metrics: []` and the empty
 Action/Result beats):
