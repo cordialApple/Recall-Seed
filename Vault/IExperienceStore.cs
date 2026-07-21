@@ -16,11 +16,12 @@ internal interface IExperienceStore
 
 internal static class ExperienceStore
 {
+    static readonly object Gate = new();
     static IExperienceStore? _current;
 
     public static IExperienceStore Current
     {
-        get => _current ??= new VaultStore();
-        set => _current = value;
+        get { lock (Gate) return _current ??= new VaultStore(); }
+        set { lock (Gate) _current = value; }
     }
 }
