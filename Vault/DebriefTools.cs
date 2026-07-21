@@ -28,7 +28,7 @@ internal static class DebriefTools
         if (experienceIds is not { Length: > 0 })
             return new DebriefResult(Prompts.Debrief, wrapped, []);
 
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new DebriefResult(Prompts.Debrief, wrapped, [], error);
 
         var wanted = new HashSet<string>(

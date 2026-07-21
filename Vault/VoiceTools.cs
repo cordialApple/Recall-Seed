@@ -15,7 +15,7 @@ internal static class VoiceTools
     public static VoiceResult VoiceGuide(
         [Description("How many recent notes to pull as samples (1-8, default 4).")] int samples = 4)
     {
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new VoiceResult(Prompts.Voice, [], error);
 
         var recent = items

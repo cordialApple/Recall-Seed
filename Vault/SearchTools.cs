@@ -18,7 +18,7 @@ internal static class SearchTools
         if (string.IsNullOrWhiteSpace(query))
             return new SearchResult([], "query must not be empty");
 
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new SearchResult([], error);
 
         var words = query.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -46,7 +46,7 @@ internal static class SearchTools
         [Description("Filter by status: draft or confirmed.")] string? status = null,
         [Description("Maximum number of experiences to return (1-200, default 25).")] int limit = 25)
     {
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new QueryResult([], error);
 
         var skillSet = Set(skills);
@@ -76,7 +76,7 @@ internal static class SearchTools
         if (string.IsNullOrWhiteSpace(id))
             return new GetResult(null, "id must not be empty");
 
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new GetResult(null, error);
 
         var found = items.FirstOrDefault(e => e.Id.Equals(id.Trim(), StringComparison.OrdinalIgnoreCase));

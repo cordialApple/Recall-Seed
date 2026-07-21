@@ -16,7 +16,7 @@ internal static class InterviewTools
     public static InterviewResult DefendRepo(
         [Description("Optional topic to scope the corpus to (matches title, tags, skills, and beat text). Omit for the whole vault.")] string? topic = null)
     {
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new InterviewResult(Prompts.Interview, Prompts.CitationInvariant, [], error);
         if (items.Count == 0)
             return new InterviewResult(Prompts.Interview, Prompts.CitationInvariant, [], "the vault has no experiences yet; bank some first");
@@ -36,7 +36,7 @@ internal static class InterviewTools
     public static CitationCheck CheckCitation(
         [Description("The chunk_ids the next question will cite (e.g. '2026-07-12-payments-migration#action').")] string[] chunkIds)
     {
-        var (items, error) = VaultStore.LoadAll();
+        var (items, error) = ExperienceStore.Current.LoadAll();
         if (error != null) return new CitationCheck(false, [], error);
 
         var valid = Chunks(items).Select(c => c.ChunkId).ToHashSet(StringComparer.OrdinalIgnoreCase);

@@ -11,7 +11,7 @@ namespace PersonalServer.Vault;
 /// truth. One experience = one file under experiences/; entity notes are the vault-root *.md files
 /// that [[wikilinks]] resolve to, so backlinks are the knowledge graph for free.
 /// </summary>
-internal static partial class VaultStore
+internal sealed partial class VaultStore : IExperienceStore
 {
     public const string EnvVar = "EXPERIENCE_VAULT";
 
@@ -30,7 +30,7 @@ internal static partial class VaultStore
 
     public static string ExperiencesDir() => Path.Combine(ResolveVault(), "experiences");
 
-    public static (IReadOnlyList<Experience> Items, string? Error) LoadAll()
+    public (IReadOnlyList<Experience> Items, string? Error) LoadAll()
     {
         var dir = ExperiencesDir();
         if (!Directory.Exists(dir))
@@ -45,7 +45,7 @@ internal static partial class VaultStore
         return (items, null);
     }
 
-    public static IReadOnlyList<string> KnownEntities()
+    public IReadOnlyList<string> KnownEntities()
     {
         var vault = ResolveVault();
         if (!Directory.Exists(vault)) return [];
@@ -139,7 +139,7 @@ internal static partial class VaultStore
         return gaps;
     }
 
-    public static (string Id, string Path, string? Error) Write(
+    public (string Id, string Path, string? Error) Write(
         string id, string title, string context, string status,
         (string Beat, string Text, string Confidence)[] beats,
         IReadOnlyList<VaultSkill> skills, IReadOnlyList<string> tags,
