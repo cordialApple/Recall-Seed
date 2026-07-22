@@ -15,4 +15,6 @@ builder.Services
     .WithStdioServerTransport()
     .WithToolsFromAssembly();
 
+PersonalServer.Vault.BackendConfig.Apply(Console.Error);
+
 await builder.Build().RunAsync();

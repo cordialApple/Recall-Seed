@@ -11,24 +11,27 @@ namespace PersonalServer.Vault;
 /// truth. One experience = one file under experiences/; entity notes are the vault-root *.md files
 /// that [[wikilinks]] resolve to, so backlinks are the knowledge graph for free.
 /// </summary>
-internal sealed partial class VaultStore : IExperienceStore
+internal sealed partial class VaultStore(string? vaultPath = null) : IExperienceStore
 {
     public const string EnvVar = "EXPERIENCE_VAULT";
+
+    readonly string? _vaultPath = vaultPath;
 
     static readonly IDeserializer Yaml = new DeserializerBuilder()
         .WithNamingConvention(LowerCaseNamingConvention.Instance)
         .IgnoreUnmatchedProperties()
         .Build();
 
-    public static string ResolveVault()
+    public string ResolveVault()
     {
+        if (!string.IsNullOrWhiteSpace(_vaultPath)) return _vaultPath;
         var env = Environment.GetEnvironmentVariable(EnvVar);
         if (!string.IsNullOrWhiteSpace(env)) return env;
         var docs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         return Path.Combine(docs, "Design_Exp");
     }
 
-    public static string ExperiencesDir() => Path.Combine(ResolveVault(), "experiences");
+    public string ExperiencesDir() => Path.Combine(ResolveVault(), "experiences");
 
     public (IReadOnlyList<Experience> Items, string? Error) LoadAll()
     {
