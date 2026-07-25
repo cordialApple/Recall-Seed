@@ -147,7 +147,7 @@ public class VaultToolTests : IDisposable
         var traversal = "../../" + Path.GetFileNameWithoutExtension(marker);
         store.Write(traversal, "T", "work", "draft", beats, [], [], [], [], []);
         Assert.False(File.Exists(marker));
-        Assert.Empty(Directory.EnumerateFiles(Path.Combine(_vault, "experiences")).Where(f => Path.GetFileName(f).Contains("escape")));
+        Assert.DoesNotContain(Directory.EnumerateFiles(Path.Combine(_vault, "experiences")), f => Path.GetFileName(f).Contains("escape"));
 
         var (okId, okPath, okErr) = store.Write("2026-07-24-safe-slug", "T", "work", "draft", beats, [], [], [], [], []);
         Assert.Null(okErr);
