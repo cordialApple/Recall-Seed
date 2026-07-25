@@ -130,6 +130,32 @@ public class VaultToolTests : IDisposable
     }
 
     [Fact]
+    public void VaultStore_Write_rejects_unsafe_id_no_file_escapes_the_vault()
+    {
+        var store = new VaultStore(_vault);
+        (string, string, string)[] beats = [("action", "did", "high")];
+        var marker = Path.Combine(Path.GetTempPath(), "psrv-escape-" + Guid.NewGuid().ToString("N") + ".md");
+
+        foreach (var bad in new[] { "../escape", "..\\escape", "a/b", "a\\b", "with space", "UPPER", "colon:x", "line\nbreak", "" })
+        {
+            var (id, path, err) = store.Write(bad, "T", "work", "draft", beats, [], [], [], [], []);
+            Assert.NotNull(err);
+            Assert.Equal("", id);
+            Assert.Equal("", path);
+        }
+
+        var traversal = "../../" + Path.GetFileNameWithoutExtension(marker);
+        store.Write(traversal, "T", "work", "draft", beats, [], [], [], [], []);
+        Assert.False(File.Exists(marker));
+        Assert.Empty(Directory.EnumerateFiles(Path.Combine(_vault, "experiences")).Where(f => Path.GetFileName(f).Contains("escape")));
+
+        var (okId, okPath, okErr) = store.Write("2026-07-24-safe-slug", "T", "work", "draft", beats, [], [], [], [], []);
+        Assert.Null(okErr);
+        Assert.Equal("2026-07-24-safe-slug", okId);
+        Assert.True(File.Exists(okPath));
+    }
+
+    [Fact]
     public void WriteExperience_validates_title_and_beats()
     {
         Assert.Equal("title must not be empty", BankTools.WriteExperience(null, "  ").Error);
