@@ -16,5 +16,6 @@ builder.Services
     .WithToolsFromAssembly();
 
 Recall_Seed.Vault.BackendConfig.Apply(Console.Error);
+Recall_Seed.Scroll.VerdictReceiver.Register(builder.Services, Console.Error);
 
 await builder.Build().RunAsync();
