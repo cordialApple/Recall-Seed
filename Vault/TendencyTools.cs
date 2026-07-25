@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Read across the whole vault to surface tendencies in how the person works.</summary>
 [McpServerToolType]

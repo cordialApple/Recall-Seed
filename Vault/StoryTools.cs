@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Turn one or more banked experiences into a grounded spoken behavioral interview answer.</summary>
 [McpServerToolType]

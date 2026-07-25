@@ -1,10 +1,10 @@
 using System.Text.Json;
-using PersonalServer.Data;
+using Recall_Seed.Data;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>
-/// Selects the experience-store backend PersonalServer runs against. STARfolio owns the choice and
+/// Selects the experience-store backend Recall_Seed runs against. STARfolio owns the choice and
 /// pushes it into a config file (see ../SuperSTAR/docs/personalserver-config-handshake.md); this
 /// reads that file. Precedence: env vars (EXPERIENCE_BACKEND / EXPERIENCE_VAULT / SUPERSTAR_DB_PATH)
 /// override the config file, which overrides the built-in default (vault). The precedence logic in
@@ -64,7 +64,7 @@ internal static class BackendConfig
     {
         var store = Select();
         ExperienceStore.Current = store;
-        log.WriteLine($"[PersonalServer] experience backend: {(store is SqliteStore ? "sqlite" : "vault")}");
+        log.WriteLine($"[Recall_Seed] experience backend: {(store is SqliteStore ? "sqlite" : "vault")}");
     }
 
     static string ConfigFilePath()
@@ -81,7 +81,7 @@ internal static class BackendConfig
         else
             dir = FirstNonBlank(Environment.GetEnvironmentVariable("XDG_DATA_HOME"))
                   ?? Path.Combine(Home(), ".local", "share");
-        return Path.Combine(dir, "PersonalServer", "config.json");
+        return Path.Combine(dir, "Recall_Seed", "config.json");
     }
 
     static string Home() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);

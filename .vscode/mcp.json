@@ -2,11 +2,11 @@
   // VS Code dev convenience. Points at the SAME published exe Claude Desktop uses,
   // so there is one runtime artifact and no `dotnet run` build step on launch.
   // Re-publish after code changes:
-  //   dotnet publish -c Release -r win-x64 -o "$env:LOCALAPPDATA\PersonalServer"
+  //   dotnet publish -c Release -r win-x64 -o "$env:LOCALAPPDATA\Recall_Seed"
   "servers": {
-    "PersonalServer": {
+    "Recall_Seed": {
       "type": "stdio",
-      "command": "${env:LOCALAPPDATA}\\PersonalServer\\PersonalServer.exe"
+      "command": "${env:LOCALAPPDATA}\\Recall_Seed\\Recall_Seed.exe"
     }
   }
 }

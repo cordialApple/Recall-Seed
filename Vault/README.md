@@ -1,6 +1,6 @@
 # Vault — the career harness
 
-The durable IP of the frozen STARfolio app, coalesced into PersonalServer as tools over a plain
+The durable IP of the frozen STARfolio app, coalesced into Recall Seed as tools over a plain
 Obsidian-style markdown vault. No app, no DB for this half — one experience = one `.md` file, and
 `[[wikilinks]]` + backlinks are the knowledge graph for free. This module is independent of
 `superstar.db` and STARfolio's loopback; it is the successor, not a proxy.

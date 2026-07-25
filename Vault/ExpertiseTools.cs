@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Summarize what the vault provably demonstrates about the person's expertise.</summary>
 [McpServerToolType]

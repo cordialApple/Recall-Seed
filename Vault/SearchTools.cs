@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Read primitives over the vault: free-text search, structured query, and fetch-one.</summary>
 [McpServerToolType]

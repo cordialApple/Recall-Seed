@@ -1,4 +1,4 @@
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>
 /// The durable IP, verbatim: STARfolio's grounded extraction/bullet/interview prompts plus the

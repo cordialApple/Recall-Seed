@@ -1,12 +1,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
   "description": "Vault-native MCP server: turns a markdown career vault into grounded resume bullets, interview answers, tendencies, and expertise, with strict no-fabrication grounding.",
-  "name": "io.github.cordialApple/PersonalServer",
+  "name": "io.github.cordialApple/Recall-Seed",
   "version": "0.1.0-beta",
   "packages": [
     {
       "registryType": "nuget",
-      "identifier": "CordialApple.PersonalServer",
+      "identifier": "CordialApple.Recall_Seed",
       "version": "0.1.0-beta",
       "transport": {
         "type": "stdio"
@@ -16,7 +16,7 @@
     }
   ],
   "repository": {
-    "url": "https://github.com/cordialApple/PersonalServer",
+    "url": "https://github.com/cordialApple/Recall-Seed",
     "source": "github"
   }
 }

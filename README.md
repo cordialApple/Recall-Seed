@@ -1,4 +1,4 @@
-# PersonalServer
+# Recall Seed
 
 **A grounded career-experience harness, delivered as an MCP server.** It turns a plain
 Obsidian-style markdown vault of your work into JD-tailored resume bullets, spoken interview answers,
@@ -33,7 +33,7 @@ corpus/aggregates and hands them back. The server retrieves and captures — it 
 
 ## Lineage: the STARfolio successor
 
-PersonalServer is the durable core of **STARfolio**, a private single-user Electron desktop app for
+Recall Seed is the durable core of **STARfolio**, a private single-user Electron desktop app for
 banking accomplishments in STAR form (Situation/Task/Action/Result). STARfolio's realtime surface —
 live voice interview, ASR, token-streaming — is app-only and stays there. Its *portable* IP, the
 grounded prompts and the defend-your-own-repo interview, was extracted and coalesced into this MCP
@@ -81,13 +81,13 @@ a new annotated class — no `Program.cs` change.
 ## Layout
 
 ```
-PersonalServer.csproj             # net10.0 console app, self-contained single-file publish
+Recall_Seed.csproj                # net10.0 console app, self-contained single-file publish
 Program.cs                        # Generic Host: stdio transport + WithToolsFromAssembly()
 Tools/PingTools.cs                # the `ping` health-check tool
 Vault/                            # the career harness — prompts, vault store, and all tools
 claude_desktop_config.sample.json # reference snippet for an MCP client's config
 scripts/smoke-ping.ps1            # non-interactive end-to-end smoke test
-tests/PersonalServer.Tests/       # xunit tests over a temp vault
+tests/Recall_Seed.Tests/          # xunit tests over a temp vault
 docs/PROOF.md                     # redacted real runs (the proof)
 ```
 
@@ -99,14 +99,14 @@ csproj declares runtime identifiers for Windows, macOS, and Linux
 
 ```bash
 # Windows (PowerShell)
-dotnet publish -c Release -r win-x64   -o "$env:LOCALAPPDATA\PersonalServer"
+dotnet publish -c Release -r win-x64   -o "$env:LOCALAPPDATA\Recall_Seed"
 # macOS (Apple silicon)
-dotnet publish -c Release -r osx-arm64 -o ~/.local/share/PersonalServer
+dotnet publish -c Release -r osx-arm64 -o ~/.local/share/Recall_Seed
 # Linux
-dotnet publish -c Release -r linux-x64 -o ~/.local/share/PersonalServer
+dotnet publish -c Release -r linux-x64 -o ~/.local/share/Recall_Seed
 ```
 
-This drops a single `PersonalServer` binary (`.exe` on Windows) at a stable location outside the repo,
+This drops a single `Recall_Seed` binary (`.exe` on Windows) at a stable location outside the repo,
 so the artifact survives `dotnet clean` and repo moves. Re-run after **any** code change, then fully
 restart your MCP client — the built binary is a snapshot, not live source.
 
@@ -121,15 +121,15 @@ restart your MCP client — the built binary is a snapshot, not live source.
    macOS:                       ~/Library/Application Support/Claude/claude_desktop_config.json
    ```
 
-   Add the `PersonalServer` entry (see [`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)).
+   Add the `Recall_Seed` entry (see [`claude_desktop_config.sample.json`](claude_desktop_config.sample.json)).
    Use the **full literal path** to the binary if your client doesn't expand environment variables. Set
    `EXPERIENCE_VAULT` in its `env` if your vault isn't at `~/Documents/Design_Exp`:
 
    ```json
    {
      "mcpServers": {
-       "PersonalServer": {
-         "command": "/absolute/path/to/PersonalServer",
+       "Recall_Seed": {
+         "command": "/absolute/path/to/Recall_Seed",
          "env": { "EXPERIENCE_VAULT": "/absolute/path/to/your/vault" }
        }
      }
@@ -144,7 +144,7 @@ restart your MCP client — the built binary is a snapshot, not live source.
 > **Windows Store (MSIX) build of Claude Desktop:** packaged apps virtualize AppData, so they do **not**
 > read `%APPDATA%\Claude\`. Edit the `LocalCache` path above, and quit Claude Desktop *completely* first
 > (tray → Quit) — the packaged app rewrites its config on preference changes and will clobber edits made
-> while it's running. Troubleshooting logs live next to the config: `…\Roaming\Claude\logs\mcp-server-PersonalServer.log`.
+> while it's running. Troubleshooting logs live next to the config: `…\Roaming\Claude\logs\mcp-server-Recall_Seed.log`.
 
 ## Other ways to run / test
 
@@ -157,12 +157,12 @@ restart your MCP client — the built binary is a snapshot, not live source.
 
 - **Full test suite:**
   ```bash
-  dotnet test tests/PersonalServer.Tests
+  dotnet test tests/Recall_Seed.Tests
   ```
 
 - **MCP Inspector (interactive):**
   ```bash
-  npx @modelcontextprotocol/inspector /path/to/PersonalServer
+  npx @modelcontextprotocol/inspector /path/to/Recall_Seed
   ```
 
 ## License

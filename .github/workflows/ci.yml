@@ -23,10 +23,10 @@ jobs:
         run: dotnet restore
 
       - name: Build (Release)
-        run: dotnet build PersonalServer.csproj -c Release --no-restore
+        run: dotnet build Recall_Seed.csproj -c Release --no-restore
 
       - name: Test
-        run: dotnet test tests/PersonalServer.Tests -c Release
+        run: dotnet test tests/Recall_Seed.Tests -c Release
 
       - name: Smoke (stdio end-to-end)
         shell: pwsh

@@ -1,6 +1,6 @@
 using Microsoft.Data.Sqlite;
 
-namespace PersonalServer.Data;
+namespace Recall_Seed.Data;
 
 /// <summary>
 /// Opens a connection, converting expected failures — a missing db, or a db that exists but is

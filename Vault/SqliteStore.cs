@@ -1,8 +1,8 @@
 using System.Globalization;
 using Microsoft.Data.Sqlite;
-using PersonalServer.Data;
+using Recall_Seed.Data;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>
 /// Reads and writes STARfolio's SQLite bank (superstar.db) behind the IExperienceStore seam, via

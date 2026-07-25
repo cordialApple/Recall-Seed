@@ -1,6 +1,6 @@
-using PersonalServer.Vault;
+using Recall_Seed.Vault;
 
-namespace PersonalServer.Tests;
+namespace Recall_Seed.Tests;
 
 public class VaultToolTests : IDisposable
 {

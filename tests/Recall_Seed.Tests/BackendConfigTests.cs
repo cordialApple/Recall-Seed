@@ -1,6 +1,6 @@
-using PersonalServer.Vault;
+using Recall_Seed.Vault;
 
-namespace PersonalServer.Tests;
+namespace Recall_Seed.Tests;
 
 public class BackendConfigTests
 {
@@ -49,7 +49,7 @@ public class BackendConfigTests
     [Fact]
     public void Env_db_path_overrides_config()
     {
-        var c = BackendConfig.Resolve(Env((PersonalServer.Data.Db.PathEnvVar, "/env/superstar.db")), """{"backend":"sqlite","dbPath":"/cfg/superstar.db"}""");
+        var c = BackendConfig.Resolve(Env((Recall_Seed.Data.Db.PathEnvVar, "/env/superstar.db")), """{"backend":"sqlite","dbPath":"/cfg/superstar.db"}""");
         Assert.Equal("/env/superstar.db", c.DbPath);
     }
 

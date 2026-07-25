@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>
 /// Reads and writes the Obsidian-style experience vault as plain markdown — the single source of
