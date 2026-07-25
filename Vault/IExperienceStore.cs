@@ -1,4 +1,4 @@
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 internal interface IExperienceStore
 {

@@ -1,7 +1,7 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  Non-interactive end-to-end smoke test for the PersonalServer MCP server (stdio).
+  Non-interactive end-to-end smoke test for the Recall_Seed MCP server (stdio).
 
 .DESCRIPTION
   Builds the project, launches the built server executable, and drives it over stdio with:
@@ -22,16 +22,16 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$proj = Join-Path $repoRoot 'PersonalServer.csproj'
+$proj = Join-Path $repoRoot 'Recall_Seed.csproj'
 
 Write-Host "==> Building ($Configuration)..." -ForegroundColor Cyan
 dotnet build $proj -c $Configuration | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "Build failed (exit $LASTEXITCODE)." }
 
 # Locate the built server host (RID-specific output dir, since the project is self-contained).
-$exe = Get-ChildItem -Path (Join-Path $repoRoot "bin/$Configuration") -Recurse -Filter 'PersonalServer.exe' -ErrorAction SilentlyContinue |
+$exe = Get-ChildItem -Path (Join-Path $repoRoot "bin/$Configuration") -Recurse -Filter 'Recall_Seed.exe' -ErrorAction SilentlyContinue |
     Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName
-if (-not $exe) { throw "Could not find a built PersonalServer.exe under bin/$Configuration." }
+if (-not $exe) { throw "Could not find a built Recall_Seed.exe under bin/$Configuration." }
 Write-Host "==> Server: $exe" -ForegroundColor Cyan
 
 # JSON-RPC frames (newline-delimited). protocolVersion matches the current MCP spec.

@@ -15,6 +15,6 @@ builder.Services
     .WithStdioServerTransport()
     .WithToolsFromAssembly();
 
-PersonalServer.Vault.BackendConfig.Apply(Console.Error);
+Recall_Seed.Vault.BackendConfig.Apply(Console.Error);
 
 await builder.Build().RunAsync();

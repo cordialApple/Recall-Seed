@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 public record VaultSkill(string Name, string Kind);
 

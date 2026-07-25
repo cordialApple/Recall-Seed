@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Turn messy career evidence into a grounded STAR note, and commit it to the vault.</summary>
 [McpServerToolType]

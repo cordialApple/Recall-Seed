@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "PersonalServer": {
-      "command": "C:\\Users\\you\\AppData\\Local\\PersonalServer\\PersonalServer.exe",
+    "Recall_Seed": {
+      "command": "C:\\Users\\you\\AppData\\Local\\Recall_Seed\\Recall_Seed.exe",
       "env": { "EXPERIENCE_VAULT": "C:\\Users\\you\\Documents\\Design_Exp" }
     }
   }

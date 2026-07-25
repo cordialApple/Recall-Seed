@@ -1,4 +1,4 @@
-# PersonalServer — Proof
+# Recall Seed — Proof
 
 Real runs of the shipped tools against my private experience vault, captured 2026-07-21 by driving
 the published server over stdio (the same JSON-RPC a client like Claude Desktop sends).
@@ -34,10 +34,10 @@ four beats, and needs no redaction (it is about this repo):
               {"name":"technical judgment","kind":"soft"}, {"name":"refactoring","kind":"technical"} ],
   "tags": ["career", "architecture", "mcp", "obsidian", "decision"],
   "metrics": [ { "label": "wall-clock, STARfolio scrap -> harness shipped", "unit": "~1 month" } ],
-  "entities": ["[[STARfolio]]", "[[Obsidian]]", "[[PersonalServer]]", "[[MCP]]", "[[Claude]]"],
-  "situation": "... i had PersonalServer, a C#/.NET stdio MCP server, that up to then basically just
+  "entities": ["[[STARfolio]]", "[[Obsidian]]", "[[Recall_Seed]]", "[[MCP]]", "[[Claude]]"],
+  "situation": "... i had Recall Seed, a C#/.NET stdio MCP server, that up to then basically just
                 bridged the old STARfolio sqlite bank.",
-  "task": "coalesce that IP into PersonalServer so the server itself is the successor to STARfolio,
+  "task": "coalesce that IP into Recall Seed so the server itself is the successor to STARfolio,
            not a proxy to the frozen app. and do it vault-first ...",
   "action": "built a Vault/ module that reads my obsidian vault directly — one experience per markdown
              file, [[wikilinks]] as the graph for free, no db at all. embedded the grounded prompts
@@ -194,6 +194,6 @@ note from ever being vouched.)
 
 ---
 
-*Captured by driving `PersonalServer.exe` over stdio (`initialize` → `tools/call`) against a
+*Captured by driving `Recall_Seed.exe` over stdio (`initialize` → `tools/call`) against a
 local vault. Metrics and ids verbatim; employer / person / institution / location specifics redacted
 in prose and slugs; the machine-specific file path field dropped; no vault data committed.*

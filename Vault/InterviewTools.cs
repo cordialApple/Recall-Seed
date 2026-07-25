@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Defend-your-own-repo mock interview grounded in the person's real vault, with a hard citation guard.</summary>
 [McpServerToolType]

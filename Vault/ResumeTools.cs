@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Turn banked experiences into JD-tailored resume bullets that never fabricate.</summary>
 [McpServerToolType]

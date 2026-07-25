@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PersonalServer.csproj" />
+    <ProjectReference Include="..\..\Recall_Seed.csproj" />
   </ItemGroup>
 
 </Project>

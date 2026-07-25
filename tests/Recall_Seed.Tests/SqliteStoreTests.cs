@@ -1,7 +1,7 @@
 using Microsoft.Data.Sqlite;
-using PersonalServer.Vault;
+using Recall_Seed.Vault;
 
-namespace PersonalServer.Tests;
+namespace Recall_Seed.Tests;
 
 public sealed class SqliteStoreTests : IDisposable
 {

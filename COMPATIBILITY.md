@@ -1,18 +1,18 @@
 # Compatibility with STARfolio
 
-PersonalServer is the vault-native successor to STARfolio's experience bank. Both model the same
+Recall Seed is the vault-native successor to STARfolio's experience bank. Both model the same
 thing (a STAR experience with skills, tags, metrics, entities, and a draft/confirmed lifecycle), so
 a note here maps cleanly onto a STARfolio `experiences` row. This file records that mapping and the
 deltas, so the two stay interoperable.
 
-- **PersonalServer**: one markdown note per experience under `experiences/`, frontmatter + `##` beats.
+- **Recall Seed**: one markdown note per experience under `experiences/`, frontmatter + `##` beats.
   Entities are `[[wikilinks]]`; backlinks are the graph. No database.
 - **STARfolio**: SQLite (`superstar.db`), `experiences` table + joined `skills`/`tags`/`metrics`/
   `sources`, plus `entities` + `edges` for the graph.
 
 ## Field map
 
-| Concept | PersonalServer note | STARfolio row | Match |
+| Concept | Recall Seed note | STARfolio row | Match |
 |---|---|---|---|
 | id | `id` (stable slug) | `id` | same |
 | title | `title` | `title` | same |
@@ -31,7 +31,7 @@ deltas, so the two stay interoperable.
 ## Deltas (not blocking)
 
 - **`result` vs `result_text`**: same R beat, different field name. No code change; just know the alias.
-- **Confidence storage**: PersonalServer persists per-beat confidence in frontmatter; STARfolio keeps
+- **Confidence storage**: Recall Seed persists per-beat confidence in frontmatter; STARfolio keeps
   it in `draft_state_json`. Same high/medium/low semantics.
 - **Dates**: STARfolio has `happened_start` / `happened_end`; the note has none (the id slug is usually
   date-prefixed, and file mtime gives `UpdatedUtc`). Could add `happened_*` to frontmatter later.

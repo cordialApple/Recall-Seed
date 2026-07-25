@@ -1,6 +1,6 @@
 using Microsoft.Data.Sqlite;
 
-namespace PersonalServer.Data;
+namespace Recall_Seed.Data;
 
 /// <summary>
 /// Resolves and opens the STARfolio SQLite database (superstar.db) that the sqlite backend reads

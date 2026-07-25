@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using ModelContextProtocol.Server;
 
-namespace PersonalServer.Vault;
+namespace Recall_Seed.Vault;
 
 /// <summary>Graph traversal over the vault — connections emerge from shared [[wikilinks]] and skills.</summary>
 [McpServerToolType]
