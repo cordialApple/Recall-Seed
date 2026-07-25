@@ -149,6 +149,12 @@ internal sealed partial class VaultStore(string? vaultPath = null) : IExperience
         IReadOnlyList<VaultMetric> metrics, IReadOnlyList<string> entities,
         IReadOnlyList<string> gaps)
     {
+        // Defense-in-depth: the store must not trust callers to have slugged the id. A raw id would
+        // let `..`/separators escape the vault via Path.Combine (line below) and newlines/`:` inject the
+        // YAML frontmatter. Reject anything that isn't the app's slug shape (a-z0-9, single hyphens).
+        if (!SafeIdRx().IsMatch(id))
+            return ("", "", $"invalid experience id '{id}': must be a lowercase slug (a-z, 0-9, hyphen)");
+
         var dir = ExperiencesDir();
         try { Directory.CreateDirectory(dir); }
         catch (Exception ex) { return ("", "", ex.Message); }
@@ -209,6 +215,9 @@ internal sealed partial class VaultStore(string? vaultPath = null) : IExperience
 
     [GeneratedRegex(@"^\s*-\s*\[[ xX]\]\s*(?<q>.+?)\s*$")]
     private static partial Regex GapRx();
+
+    [GeneratedRegex(@"\A[a-z0-9]+(?:-[a-z0-9]+)*\z")]
+    private static partial Regex SafeIdRx();
 
     sealed class FrontmatterYaml
     {
