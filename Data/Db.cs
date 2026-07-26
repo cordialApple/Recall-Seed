@@ -4,7 +4,7 @@ namespace Recall_Seed.Data;
 
 /// <summary>
 /// Resolves and opens the STARfolio SQLite database (superstar.db) that the sqlite backend reads
-/// from and writes to. The shared read/write contract — views, writable tables, pragmas — is
+/// from and writes to. The shared read/write contract (views, writable tables, pragmas) is
 /// documented in docs/architecture/db-contract.md.
 /// </summary>
 internal static class Db

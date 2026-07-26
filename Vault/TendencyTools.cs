@@ -8,8 +8,8 @@ namespace Recall_Seed.Vault;
 internal static class TendencyTools
 {
     [McpServerTool(Name = "find_tendencies")]
-    [Description("Compute real aggregates across the entire experience vault — skill/tag/context/entity " +
-                 "frequencies, metric coverage, open gaps, draft vs confirmed — and return them with the " +
+    [Description("Compute real aggregates across the entire experience vault, skill/tag/context/entity " +
+                 "frequencies, metric coverage, open gaps, draft vs confirmed, and return them with the " +
                  "grounded tendency-analysis prompt. The counts are ground truth; interpret them into " +
                  "patterns in how the person works (recurring strengths, dominant contexts, where results " +
                  "are unquantified) without inventing or adjusting any number.")]

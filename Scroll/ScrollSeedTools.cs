@@ -6,7 +6,7 @@ namespace Recall_Seed.Scroll;
 /// <summary>
 /// Seeds a programmatic (Claude-only) ide-es coding problem into Scroll and returns a spawn URL. This is
 /// the whole PersonalServer side of contract 2: build+validate the schema, bake in a correlation-bearing
-/// loopback resultCallbackUrl, encode, and hand back a URL. No editor, no grader, no sandbox lives here —
+/// loopback resultCallbackUrl, encode, and hand back a URL. No editor, no grader, no sandbox lives here.
 /// Scroll owns spawning, hosting, and grading. programmatic is forced to 'on' (bare seed-and-grade).
 /// </summary>
 [McpServerToolType]
@@ -16,7 +16,7 @@ internal static class ScrollSeedTools
     [Description("Seed a coding problem into Scroll's ide-es endpoint spawner and get back a URL to hand " +
                  "the user in conversation. You author the problem; Scroll hosts the editor and runs the " +
                  "hidden-test grader. Requires: title, problem statement, goalCondition (what 'done' means), " +
-                 "functionName (the JS function the grader calls), tests (at least one MUST be hidden — the " +
+                 "functionName (the JS function the grader calls), tests (at least one MUST be hidden, the " +
                  "hidden set is the graded oracle; add an adversarially large hidden input to force the " +
                  "efficient solution), and tleBudgetMs (per-test wall-clock budget that gates brute force). " +
                  "Optional: complexityBudget (informational, e.g. 'O(n log n)') and staged hints. Returns a " +
@@ -36,7 +36,7 @@ internal static class ScrollSeedTools
         => Build(ScrollSpawnConfig.ResolveBaseUrl(), ScrollSpawnConfig.ReceiverPort(), Guid.NewGuid().ToString("N"),
             title, problem, goalCondition, functionName, tests, tleBudgetMs, complexityBudget, hints, lifecycleOwner);
 
-    /// <summary>Pure core: resolved config + correlation in, result out — no env, no clock, no randomness.</summary>
+    /// <summary>Pure core: resolved config + correlation in, result out, no env, no clock, no randomness.</summary>
     internal static SeedResult Build(
         string? baseUrl, int? receiverPort, string correlationId,
         string title, string problem, string goalCondition, string functionName,

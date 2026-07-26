@@ -3,14 +3,14 @@ using ModelContextProtocol.Server;
 
 namespace Recall_Seed.Vault;
 
-/// <summary>Graph traversal over the vault — connections emerge from shared [[wikilinks]] and skills.</summary>
+/// <summary>Graph traversal over the vault, connections emerge from shared [[wikilinks]] and skills.</summary>
 [McpServerToolType]
 internal static class GraphTools
 {
     [McpServerTool(Name = "neighbors")]
     [Description("Return the neighborhood of one experience: the entities it links to via [[wikilinks]], " +
                  "plus other experiences connected to it by a shared entity or a shared skill (each " +
-                 "labeled with the via-name). The graph is emergent from the vault's own backlinks — no " +
+                 "labeled with the via-name). The graph is emergent from the vault's own backlinks, no " +
                  "edges table. Pass an experience id from search_experiences or query_experiences.")]
     public static NeighborsResult Neighbors(
         [Description("The id of the experience to find neighbors for.")] string experienceId)

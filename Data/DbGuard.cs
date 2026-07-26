@@ -3,8 +3,8 @@ using Microsoft.Data.Sqlite;
 namespace Recall_Seed.Data;
 
 /// <summary>
-/// Opens a connection, converting expected failures — a missing db, or a db that exists but is
-/// locked/corrupt (SqliteException from open or a startup pragma) — into an error string the caller
+/// Opens a connection, converting expected failures, a missing db, or a db that exists but is
+/// locked/corrupt (SqliteException from open or a startup pragma), into an error string the caller
 /// returns as structured output instead of throwing over stdio. Connections already have
 /// busy_timeout and foreign_keys = ON set by <see cref="Db"/>.
 /// </summary>

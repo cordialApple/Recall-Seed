@@ -8,7 +8,7 @@ namespace Recall_Seed.Scroll;
 /// <summary>
 /// C# mirror of Scroll's ide-es spawn schema (docs/contracts/ide-es.v1.json, src/es/schema.ts). This is
 /// PersonalServer depending on Scroll's versioned contract: the fields, the schemaVersion/kind pins, and
-/// the validator all track validateIdeEsSchema exactly — no looser, no stricter — so we never hand the
+/// the validator all track validateIdeEsSchema exactly (no looser, no stricter) so we never hand the
 /// user a spawn URL that create_ide_es would reject, and never change the contract unilaterally.
 /// </summary>
 internal sealed record IdeEsSchema(

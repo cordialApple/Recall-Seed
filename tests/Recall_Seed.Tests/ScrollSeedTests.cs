@@ -7,7 +7,7 @@ namespace Recall_Seed.Tests;
 
 static class B64
 {
-    // Inverse of Scroll's src/es/programmatic.ts fromBase64Url — proves our encoder is decodable there.
+    // Inverse of Scroll's src/es/programmatic.ts fromBase64Url, proves our encoder is decodable there.
     public static string Decode(string param)
     {
         var s = param.Replace('-', '+').Replace('_', '/');

@@ -7,7 +7,7 @@ namespace Recall_Seed.Vault;
 /// <summary>
 /// Reads and writes STARfolio's SQLite bank (superstar.db) behind the IExperienceStore seam, via
 /// the stable v_* contract views (read) and the writable base tables (write). The SQL contract has
-/// no per-beat confidence or gap-question concept — those are vault-native. So on read, confidence
+/// no per-beat confidence or gap-question concept, those are vault-native. So on read, confidence
 /// is derived from status (confirmed → high, draft → medium) and gaps are empty; on write, gaps,
 /// confidence, and entities are dropped rather than mis-encoded into STARfolio's typed graph.
 /// </summary>

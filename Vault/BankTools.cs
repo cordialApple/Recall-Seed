@@ -20,7 +20,7 @@ internal static partial class BankTools
                  "write_experience. Grounding is the point: never invent facts/numbers/outcomes; leave " +
                  "absent beats thin with a gap question; keep metrics verbatim.")]
     public static BankResult BankExperience(
-        [Description("The raw input to extract from — messy notes, resume text, or flattened code/repo/spreadsheet evidence.")] string input,
+        [Description("The raw input to extract from, messy notes, resume text, or flattened code/repo/spreadsheet evidence.")] string input,
         [Description("Kind of input: 'notes', 'resume', or 'evidence'. Picks the matching grounded prompt.")] string kind = "notes")
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -41,7 +41,7 @@ internal static partial class BankTools
 
     [McpServerTool(Name = "write_experience")]
     [Description("Commit a grounded STAR note to the experience vault as one markdown file under " +
-                 "experiences/. Shape the record with bank_experience first — this is the commit step. " +
+                 "experiences/. Shape the record with bank_experience first, this is the commit step. " +
                  "Writes frontmatter (id/title/context/status/confidence/skills/tags/metrics/entities) " +
                  "and the STAR beats, with gaps as todo checkboxes. Metrics are written verbatim; do not " +
                  "invent any. Entities should be [[wikilink]] targets (bare names accepted).")]
@@ -59,10 +59,10 @@ internal static partial class BankTools
         [Description("Context: work, project, class, or other.")] string context = "work",
         [Description("Skills to link, each { name, kind: technical|soft|domain }.")] VaultSkill[]? skills = null,
         [Description("Short topical tags.")] string[]? tags = null,
-        [Description("Metrics, each { label, value?, unit? } — verbatim from the source, never invented.")] VaultMetric[]? metrics = null,
+        [Description("Metrics, each { label, value?, unit? }, verbatim from the source, never invented.")] VaultMetric[]? metrics = null,
         [Description("Named entities as [[wikilink]] targets or bare names (people/teams/projects/orgs/tools).")] string[]? entities = null,
-        [Description("Gap questions for thin/absent beats — the person answers these to confirm the draft.")] string[]? gaps = null,
-        [Description("Status: draft (default). To confirm a note, use confirm_experience — write creates drafts.")] string status = "draft")
+        [Description("Gap questions for thin/absent beats, the person answers these to confirm the draft.")] string[]? gaps = null,
+        [Description("Status: draft (default). To confirm a note, use confirm_experience, write creates drafts.")] string status = "draft")
     {
         if (string.IsNullOrWhiteSpace(title))
             return new WriteResult(null, Error: "title must not be empty");
@@ -122,7 +122,7 @@ internal static partial class BankTools
         [Description("New context: work, project, class, or other. Omit to keep.")] string? context = null,
         [Description("Replacement skills list, each { name, kind }. Omit to keep, [] to clear.")] VaultSkill[]? skills = null,
         [Description("Replacement tags list. Omit to keep, [] to clear.")] string[]? tags = null,
-        [Description("Replacement metrics list, each { label, value?, unit? } — verbatim, never invented. Omit to keep, [] to clear.")] VaultMetric[]? metrics = null,
+        [Description("Replacement metrics list, each { label, value?, unit? }, verbatim, never invented. Omit to keep, [] to clear.")] VaultMetric[]? metrics = null,
         [Description("Replacement entities list ([[wikilink]] or bare names). Omit to keep, [] to clear.")] string[]? entities = null,
         [Description("Replacement gap-questions list. Answer a gap by dropping it here. Omit to keep, [] to clear.")] string[]? gaps = null,
         [Description("New status: draft or confirmed. Omit to keep.")] string? status = null)
@@ -174,7 +174,7 @@ internal static partial class BankTools
     }
 
     [McpServerTool(Name = "confirm_experience")]
-    [Description("Flip a note's status from draft to confirmed by id — the person vouching the draft is " +
+    [Description("Flip a note's status from draft to confirmed by id, the person vouching the draft is " +
                  "true. Refuses if the action or result beat is empty or low-confidence, or open gaps " +
                  "remain, and reports exactly what blocks so you know what to fill with update_experience.")]
     public static WriteResult ConfirmExperience(

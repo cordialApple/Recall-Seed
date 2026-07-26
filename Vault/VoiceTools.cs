@@ -9,7 +9,7 @@ internal static class VoiceTools
 {
     [McpServerTool(Name = "voice_guide")]
     [Description("Return the voice rules for writing anything under the person's name (STAR notes, " +
-                 "bullets, posts, PRs) plus a few recent vault notes as fresh style samples — real " +
+                 "bullets, posts, PRs) plus a few recent vault notes as fresh style samples, real " +
                  "writing beats a rulebook, so mirror the samples' phrasing over the frozen rules. Run " +
                  "user-facing text through this as a post-process layer.")]
     public static VoiceResult VoiceGuide(

@@ -9,7 +9,7 @@ builder.Logging.AddConsole(o => o.LogToStandardErrorThreshold = LogLevel.Trace);
 
 // Add the MCP services: the stdio transport and all tools discovered in this assembly.
 // Tool classes are auto-discovered via the [McpServerToolType] attribute, so adding a new
-// tool is just a matter of creating an annotated class — no edits are needed here.
+// tool is just a matter of creating an annotated class, no edits are needed here.
 builder.Services
     .AddMcpServer()
     .WithStdioServerTransport()
