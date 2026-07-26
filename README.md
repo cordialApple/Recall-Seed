@@ -5,11 +5,12 @@
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
 [![MCP](https://img.shields.io/badge/MCP-stdio%20server-black.svg)](https://modelcontextprotocol.io/)
 
-**A grounded career-experience harness, delivered as an MCP server.** It turns a plain
-Obsidian-style markdown vault of your work into JD-tailored resume bullets, spoken interview answers,
-cross-vault tendencies, and an evidence-weighted expertise profile, and its whole reason to exist is
-that it **never fabricates**. Every metric is verbatim from your notes, every claim traces to a source
-id, and it will *refuse to vouch a thin story rather than invent one*.
+**A grounded career-experience harness, delivered as an MCP server.** From your MCP client it creates
+a live coding endpoint with a problem statement plus hidden test cases and reads back the graded
+verdict. It also banks your projects/experiences into source-traceable STAR stories, quality-gated on
+business value and architectural decisions. On that grounded corpus it also surfaces cross-vault
+tendencies, an evidence-weighted expertise profile, interview answers, and resume bullets, each traced
+to its source and never invented.
 
 Written in C# on **.NET 10** using the official
 [`ModelContextProtocol`](https://www.nuget.org/packages/ModelContextProtocol) SDK; built for
