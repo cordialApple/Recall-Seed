@@ -24,64 +24,6 @@ Written in C# on **.NET 10** using the official
 > resume bullets each tagged with their source `experience_id`, real `find_tendencies` counts, and the
 > keystone, a thin note that yields a gap question, **not an invented metric**.
 
-## The moat: grounding + ensureCited
-
-Two disciplines, embedded verbatim in [`Vault/Prompts.cs`](Vault/Prompts.cs), make the output
-trustworthy:
-
-- **Grounding**: never invent a fact, number, or outcome. An absent beat stays thin, low-confidence,
-  and carries a *gap question*; metrics are copied verbatim. Vouching a note as true
-  (`confirm_experience`) is refused while its action/result is thin or open gaps remain, and
-  `write_experience` won't mint a `confirmed` note either, so confirmed status is only ever earned
-  through that gate.
-- **ensureCited**: every *non-terminal* interview question must cite ≥1 real corpus `chunk_id`; a
-  question that can't be tied to one is out of bounds. `check_citation` is the guard that verifies the
-  cited ids are real before the question is asked.
-
-The LLM runs in the *calling* agent; each tool assembles the grounded prompt plus the real
-corpus/aggregates and hands them back. The server retrieves and captures. It does not author.
-
-## Lineage: the STARfolio successor
-
-Recall Seed is the durable core of **STARfolio**, a private single-user Electron desktop app for
-banking accomplishments in STAR form (Situation/Task/Action/Result). STARfolio's realtime surface
-(live voice interview, ASR, token-streaming) is app-only and stays there. Its *portable* IP, the
-grounded prompts and the defend-your-own-repo interview, was extracted and coalesced into this MCP
-server over a plain markdown vault, so the moat lives in code you can read rather than a frozen app.
-STARfolio is now a **sibling to complement, not a backend**. The field-level mapping between the two
-lives in [`COMPATIBILITY.md`](COMPATIBILITY.md).
-
-## Storage: one seam, two backends
-
-The default backend is the **vault**: one experience = one markdown file under `experiences/`;
-`[[wikilinks]]` + backlinks are the knowledge graph for free, no database. The vault location resolves
-from `EXPERIENCE_VAULT`, else `~/Documents/Design_Exp`. A missing vault returns a structured error
-naming the resolved path, not a crash. See [`Vault/README.md`](Vault/README.md) for the full rationale.
-
-Behind [`IExperienceStore`](Vault/IExperienceStore.cs) sits a second, opt-in backend: **sqlite**, which
-reads and writes STARfolio's own `superstar.db` over a stable views/contract surface (WAL mode, so it
-works whether or not the STARfolio GUI is open). [`BackendConfig`](Vault/BackendConfig.cs) picks the
-store: env vars override a STARfolio-written config file, which overrides the built-in vault default:
-
-```
-EXPERIENCE_BACKEND = vault | sqlite       # default: vault
-EXPERIENCE_VAULT   = /path/to/your/vault  # vault backend
-SUPERSTAR_DB_PATH  = /path/to/superstar.db # sqlite backend
-```
-
-Same tools, same grounding, either substrate. The moat sits above the seam, so it is identical on
-both stores. The sqlite backend opens the DB in WAL mode with a `busy_timeout`, so it reads and writes
-concurrently whether or not the STARfolio GUI is open, and only ever through STARfolio's stable
-read/write contract surface. The full shape is in
-[`docs/architecture/db-contract.md`](docs/architecture/db-contract.md); the design overview is in
-[`docs/architecture.md`](docs/architecture.md).
-
-> **How an MCP stdio server runs:** it is *not* a daemon and you never start it yourself. The client
-> (e.g. Claude Desktop) launches the server as a child process on demand and talks to it over stdio.
-> `stdout` is reserved for the JSON-RPC protocol; **all logging goes to stderr**. "Always available"
-> just means the client can spawn it instantly, which is why we publish a fast, self-contained binary
-> and point the client at it (no `dotnet run`, no SDK needed at launch).
-
 ## Tools
 
 **Career vault**, the grounded harness over your experiences:
@@ -131,6 +73,64 @@ small JSON POST (with a CORS preflight answered so the browser fetch reaches it)
 logs it keyed by the correlation id. `get_scroll_verdict(spawnId)` then reads the latest verdict for
 that problem. If the receiver is disabled, `seed_ide_endpoint` reports `callbackWired: false` and no
 verdict will ever arrive.
+
+## Lineage: the STARfolio successor
+
+Recall Seed is the durable core of **STARfolio**, a private single-user Electron desktop app for
+banking accomplishments in STAR form (Situation/Task/Action/Result). STARfolio's realtime surface
+(live voice interview, ASR, token-streaming) is app-only and stays there. Its *portable* IP, the
+grounded prompts and the defend-your-own-repo interview, was extracted and coalesced into this MCP
+server over a plain markdown vault, so the moat lives in code you can read rather than a frozen app.
+STARfolio is now a **sibling to complement, not a backend**. The field-level mapping between the two
+lives in [`COMPATIBILITY.md`](COMPATIBILITY.md).
+
+## Storage: one seam, two backends
+
+The default backend is the **vault**: one experience = one markdown file under `experiences/`;
+`[[wikilinks]]` + backlinks are the knowledge graph for free, no database. The vault location resolves
+from `EXPERIENCE_VAULT`, else `~/Documents/Design_Exp`. A missing vault returns a structured error
+naming the resolved path, not a crash. See [`Vault/README.md`](Vault/README.md) for the full rationale.
+
+Behind [`IExperienceStore`](Vault/IExperienceStore.cs) sits a second, opt-in backend: **sqlite**, which
+reads and writes STARfolio's own `superstar.db` over a stable views/contract surface (WAL mode, so it
+works whether or not the STARfolio GUI is open). [`BackendConfig`](Vault/BackendConfig.cs) picks the
+store: env vars override a STARfolio-written config file, which overrides the built-in vault default:
+
+```
+EXPERIENCE_BACKEND = vault | sqlite       # default: vault
+EXPERIENCE_VAULT   = /path/to/your/vault  # vault backend
+SUPERSTAR_DB_PATH  = /path/to/superstar.db # sqlite backend
+```
+
+Same tools, same grounding, either substrate. The moat sits above the seam, so it is identical on
+both stores. The sqlite backend opens the DB in WAL mode with a `busy_timeout`, so it reads and writes
+concurrently whether or not the STARfolio GUI is open, and only ever through STARfolio's stable
+read/write contract surface. The full shape is in
+[`docs/architecture/db-contract.md`](docs/architecture/db-contract.md); the design overview is in
+[`docs/architecture.md`](docs/architecture.md).
+
+> **How an MCP stdio server runs:** it is *not* a daemon and you never start it yourself. The client
+> (e.g. Claude Desktop) launches the server as a child process on demand and talks to it over stdio.
+> `stdout` is reserved for the JSON-RPC protocol; **all logging goes to stderr**. "Always available"
+> just means the client can spawn it instantly, which is why we publish a fast, self-contained binary
+> and point the client at it (no `dotnet run`, no SDK needed at launch).
+
+## The moat: grounding + ensureCited
+
+Two disciplines, embedded verbatim in [`Vault/Prompts.cs`](Vault/Prompts.cs), make the output
+trustworthy:
+
+- **Grounding**: never invent a fact, number, or outcome. An absent beat stays thin, low-confidence,
+  and carries a *gap question*; metrics are copied verbatim. Vouching a note as true
+  (`confirm_experience`) is refused while its action/result is thin or open gaps remain, and
+  `write_experience` won't mint a `confirmed` note either, so confirmed status is only ever earned
+  through that gate.
+- **ensureCited**: every *non-terminal* interview question must cite ≥1 real corpus `chunk_id`; a
+  question that can't be tied to one is out of bounds. `check_citation` is the guard that verifies the
+  cited ids are real before the question is asked.
+
+The LLM runs in the *calling* agent; each tool assembles the grounded prompt plus the real
+corpus/aggregates and hands them back. The server retrieves and captures. It does not author.
 
 ## Environment variables
 
