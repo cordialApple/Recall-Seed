@@ -9,7 +9,7 @@ namespace Recall_Seed.Scroll;
 /// range) but tolerates unknown extra fields so a future minor wire rev still delivers.
 /// </summary>
 internal sealed record ScrollVerdict(
-    string EndpointId, string Status, bool WithinBudget, int Passed, int Total, long At)
+    string EndpointId, string Status, bool WithinBudget, int Passed, int Total, long At, string? Correlation = null)
 {
     static readonly HashSet<string> ValidStatus = new(StringComparer.Ordinal) { "pass", "fail", "tle", "error" };
 

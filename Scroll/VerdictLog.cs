@@ -42,11 +42,17 @@ internal sealed class VerdictLog
     }
 
     public ScrollVerdict? Latest(string? endpointId = null)
+        => NewestWhere(v => endpointId == null || v.EndpointId == endpointId);
+
+    public ScrollVerdict? LatestByCorrelation(string correlationId)
+        => NewestWhere(v => v.Correlation == correlationId);
+
+    ScrollVerdict? NewestWhere(Func<ScrollVerdict, bool> match)
     {
         lock (_gate)
         {
             for (var n = _items.Last; n != null; n = n.Previous)
-                if (endpointId == null || n.Value.EndpointId == endpointId) return n.Value;
+                if (match(n.Value)) return n.Value;
         }
         return null;
     }

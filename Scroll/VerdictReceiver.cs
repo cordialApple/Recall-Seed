@@ -93,6 +93,8 @@ internal sealed class VerdictReceiver : IHostedService
 
             if (ScrollVerdict.TryParse(body, out var verdict, out var error))
             {
+                var correlation = ctx.Request.QueryString["c"];
+                if (!string.IsNullOrEmpty(correlation)) verdict = verdict! with { Correlation = correlation };
                 _log.Add(verdict!);
                 Respond(ctx, 204);
             }

@@ -83,6 +83,20 @@ public class VerdictLogTests
         Assert.Equal("b", log.Latest()!.EndpointId);   // newest overall
         Assert.Null(log.Latest("missing"));
     }
+
+    [Fact]
+    public void LatestByCorrelation_matches_the_baked_in_id_not_the_endpoint()
+    {
+        var log = new VerdictLog();
+        log.Add(new ScrollVerdict("ep-x", "pass", true, 1, 1, 1, Correlation: "corr-1"));
+        log.Add(new ScrollVerdict("ep-y", "fail", true, 0, 1, 2, Correlation: "corr-2"));
+        log.Add(new ScrollVerdict("ep-z", "tle", false, 0, 1, 3)); // no correlation (e.g. manual spawn)
+
+        Assert.Equal("ep-x", log.LatestByCorrelation("corr-1")!.EndpointId);
+        Assert.Equal("fail", log.LatestByCorrelation("corr-2")!.Status);
+        Assert.Null(log.LatestByCorrelation("nope"));
+        Assert.Null(log.LatestByCorrelation("ep-x")); // endpoint id is not a correlation key
+    }
 }
 
 public class ScrollReceiverConfigTests
@@ -107,20 +121,23 @@ public class ScrollReceiverConfigTests
 public class ScrollVerdictToolTests
 {
     [Fact]
-    public void get_scroll_verdict_reads_the_shared_log_by_endpoint()
+    public void get_scroll_verdict_reads_the_shared_log_by_spawn_id()
     {
+        var corr = "corr-tool-" + Guid.NewGuid().ToString("N");
         var id = "ep-tool-" + Guid.NewGuid().ToString("N");
-        VerdictLog.Shared.Add(new ScrollVerdict(id, "tle", false, 3, 4, 1700000000001));
+        VerdictLog.Shared.Add(new ScrollVerdict(id, "tle", false, 3, 4, 1700000000001, Correlation: corr));
 
-        var byId = ScrollVerdictTools.GetScrollVerdict(id);
-        var v = Assert.Single(byId.Verdicts);
+        var bySpawn = ScrollVerdictTools.GetScrollVerdict(corr);
+        var v = Assert.Single(bySpawn.Verdicts);
+        Assert.Equal(corr, v.SpawnId);
         Assert.Equal(id, v.EndpointId);
         Assert.Equal("tle", v.Status);
         Assert.False(v.WithinBudget);
         Assert.Equal(3, v.Passed);
         Assert.Equal(4, v.Total);
 
-        Assert.Contains(ScrollVerdictTools.GetScrollVerdict(limit: 100).Verdicts, x => x.EndpointId == id);
-        Assert.Empty(ScrollVerdictTools.GetScrollVerdict("ep-none-" + Guid.NewGuid().ToString("N")).Verdicts);
+        Assert.Contains(ScrollVerdictTools.GetScrollVerdict(limit: 100).Verdicts, x => x.SpawnId == corr);
+        Assert.Empty(ScrollVerdictTools.GetScrollVerdict(id).Verdicts); // endpoint id is not the correlation key
+        Assert.Empty(ScrollVerdictTools.GetScrollVerdict("corr-none-" + Guid.NewGuid().ToString("N")).Verdicts);
     }
 }
