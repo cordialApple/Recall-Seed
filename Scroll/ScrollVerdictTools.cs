@@ -9,8 +9,8 @@ internal static class ScrollVerdictTools
 {
     [McpServerTool(Name = "get_scroll_verdict")]
     [Description("Return the most recent Scroll endpoint-spawner grading verdict(s) delivered to this " +
-                 "server over the loopback callback. Scroll POSTs a verdict — status (pass|fail|tle|error) " +
-                 "with passed/total counts and a timestamp — when a spawned coding endpoint is submitted. " +
+                 "server over the loopback callback. Scroll POSTs a verdict: status (pass|fail|tle|error) " +
+                 "with passed/total counts and a timestamp, when a spawned coding endpoint is submitted. " +
                  "Pass the spawnId returned by seed_ide_endpoint to get just that problem's latest verdict " +
                  "(the endpoint id is browser-minted and opaque, so spawnId is the correlation key); " +
                  "otherwise get the newest verdicts across all endpoints. Returns an empty list if the " +

@@ -2,7 +2,7 @@ namespace Recall_Seed.Scroll;
 
 /// <summary>
 /// Opt-in config for the loopback verdict receiver. The receiver stays OFF unless SCROLL_VERDICT_PORT
-/// names a valid port — the default remains a pure stdio MCP server with no listening socket. Resolve
+/// names a valid port, the default remains a pure stdio MCP server with no listening socket. Resolve
 /// is pure (env dictionary in, port-or-null out) so it is unit-testable without touching the environment.
 /// </summary>
 internal static class ScrollReceiverConfig

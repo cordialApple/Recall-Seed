@@ -5,8 +5,8 @@ using Microsoft.Extensions.Hosting;
 namespace Recall_Seed.Scroll;
 
 /// <summary>
-/// Loopback HTTP sink for contract-6 verdicts. Binds http://127.0.0.1:{port}/ — a specific loopback IP,
-/// never a public interface — accepts a POST with a small JSON body, strict-parses it, and appends to a
+/// Loopback HTTP sink for contract-6 verdicts. Binds http://127.0.0.1:{port}/ (a specific loopback IP,
+/// never a public interface), accepts a POST with a small JSON body, strict-parses it, and appends to a
 /// <see cref="VerdictLog"/>. The peer is fire-and-forget, so anything malformed/oversized/wrong-method
 /// gets a 4xx and is dropped; a handler fault never takes down the accept loop.
 /// </summary>

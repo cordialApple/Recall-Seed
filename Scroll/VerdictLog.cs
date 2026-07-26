@@ -3,7 +3,7 @@ namespace Recall_Seed.Scroll;
 /// <summary>
 /// Thread-safe bounded in-memory log of the most recent contract-6 verdicts. Written by the receiver's
 /// accept-loop thread, read by the MCP tool thread, so every access is under a lock. Bounded (ring):
-/// oldest verdicts are evicted past capacity — this is a live status window, not durable storage.
+/// oldest verdicts are evicted past capacity, this is a live status window, not durable storage.
 /// </summary>
 internal sealed class VerdictLog
 {

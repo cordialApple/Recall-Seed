@@ -8,8 +8,8 @@ namespace Recall_Seed.Vault;
 internal static class SearchTools
 {
     [McpServerTool(Name = "search_experiences")]
-    [Description("Free-text search across the experience vault — matches title, STAR beats, tags, " +
-                 "skills, and linked entities — ranked by relevance with a snippet. Use to pull the " +
+    [Description("Free-text search across the experience vault, matches title, STAR beats, tags, " +
+                 "skills, and linked entities, ranked by relevance with a snippet. Use to pull the " +
                  "specific experiences relevant to a question before grounding an answer in them.")]
     public static SearchResult SearchExperiences(
         [Description("The text to search for.")] string query,
@@ -67,7 +67,7 @@ internal static class SearchTools
     }
 
     [McpServerTool(Name = "get_experience")]
-    [Description("Fetch one full experience note by its id — frontmatter, all STAR beats, metrics, " +
+    [Description("Fetch one full experience note by its id: frontmatter, all STAR beats, metrics, " +
                  "entities, and open gaps. Use after search_experiences or query_experiences to read " +
                  "the complete grounded record.")]
     public static GetResult GetExperience(

@@ -32,7 +32,7 @@ internal static class InterviewTools
     [McpServerTool(Name = "check_citation")]
     [Description("Enforce the ensureCited invariant: given the chunk_ids you intend to cite in the next " +
                  "interview question, returns whether they all exist in the vault corpus and lists any " +
-                 "unknown ones. A question that cites an unknown chunk_id is out of bounds — drop it.")]
+                 "unknown ones. A question that cites an unknown chunk_id is out of bounds, drop it.")]
     public static CitationCheck CheckCitation(
         [Description("The chunk_ids the next question will cite (e.g. '2026-07-12-payments-migration#action').")] string[] chunkIds)
     {

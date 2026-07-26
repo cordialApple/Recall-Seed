@@ -7,7 +7,7 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace Recall_Seed.Vault;
 
 /// <summary>
-/// Reads and writes the Obsidian-style experience vault as plain markdown — the single source of
+/// Reads and writes the Obsidian-style experience vault as plain markdown, the single source of
 /// truth. One experience = one file under experiences/; entity notes are the vault-root *.md files
 /// that [[wikilinks]] resolve to, so backlinks are the knowledge graph for free.
 /// </summary>

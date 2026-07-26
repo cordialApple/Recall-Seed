@@ -11,7 +11,7 @@ internal static class ExpertiseTools
     [Description("Build an evidence-grounded expertise profile from the vault: each skill weighted by " +
                  "how many experiences evidence it (with their ids), the experiences carrying concrete " +
                  "metrics (the strongest, most defensible results), and the recurring domains/tags. " +
-                 "Returns the aggregates plus the grounded prompt — describe only what the evidence backs, " +
+                 "Returns the aggregates plus the grounded prompt, describe only what the evidence backs, " +
                  "preserve metrics verbatim, and be honest about thinly-evidenced skills.")]
     public static ExpertiseResult ExpertiseProfile()
     {

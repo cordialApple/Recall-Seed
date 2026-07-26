@@ -2,11 +2,11 @@
 <#
 .SYNOPSIS
   One-time repo config for the /next-stage auto-merge loop: allow squash + auto-merge and
-  delete the branch on merge. Idempotent — safe to re-run.
+  delete the branch on merge. Idempotent, safe to re-run.
 
 .DESCRIPTION
   Merging itself is done by .github/workflows/auto-merge.yml (label-gated, on CI success), so
-  no branch protection is required — branch protection needs GitHub Pro on a private repo and
+  no branch protection is required, branch protection needs GitHub Pro on a private repo and
   is deliberately NOT used here. Requires gh authenticated with 'repo' scope.
 
 .EXAMPLE

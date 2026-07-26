@@ -10,7 +10,7 @@ internal static class DebriefTools
     [McpServerTool(Name = "debrief_interview")]
     [Description("Assemble the grounded debrief prompt plus the interview transcript (wrapped as DATA) and " +
                  "any named experiences for provenance, so you can write overall feedback, strengths, " +
-                 "improvement areas, and reconstructed STAR stories. Grounded to the transcript only — never " +
+                 "improvement areas, and reconstructed STAR stories. Grounded to the transcript only, never " +
                  "fabricate a metric, outcome, company, or detail the candidate did not state. Pass optional experience " +
                  "ids from search_experiences or query_experiences to tie reconstructed stories back to banked notes.")]
     public static DebriefResult DebriefInterview(
