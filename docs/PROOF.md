@@ -39,7 +39,7 @@ four beats, and needs no redaction (it is about this repo):
                 bridged the old STARfolio sqlite bank.",
   "task": "coalesce that IP into Recall Seed so the server itself is the successor to STARfolio,
            not a proxy to the frozen app. and do it vault-first ...",
-  "action": "built a Vault/ module that reads my obsidian vault directly — one experience per markdown
+  "action": "built a Vault/ module that reads my obsidian vault directly, one experience per markdown
              file, [[wikilinks]] as the graph for free, no db at all. embedded the grounded prompts
              verbatim ... shipped it as eight tools in one PR ...",
   "result": "honestly it's still theoretical until the vault actually has real experiences banked in
