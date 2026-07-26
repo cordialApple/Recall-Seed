@@ -81,6 +81,14 @@ internal sealed class VerdictReceiver : IHostedService
     {
         try
         {
+            // Scroll's contract-6 POST is a cross-origin browser fetch (application/json => non-simple),
+            // so the browser sends a CORS preflight first; answer it or the real POST never leaves the tab.
+            if (string.Equals(ctx.Request.HttpMethod, "OPTIONS", StringComparison.OrdinalIgnoreCase))
+            {
+                Respond(ctx, 204);
+                return;
+            }
+
             if (!string.Equals(ctx.Request.HttpMethod, "POST", StringComparison.OrdinalIgnoreCase))
             {
                 Respond(ctx, 405);
@@ -93,6 +101,8 @@ internal sealed class VerdictReceiver : IHostedService
 
             if (ScrollVerdict.TryParse(body, out var verdict, out var error))
             {
+                var correlation = ctx.Request.QueryString["c"];
+                if (!string.IsNullOrEmpty(correlation)) verdict = verdict! with { Correlation = correlation };
                 _log.Add(verdict!);
                 Respond(ctx, 204);
             }
@@ -125,6 +135,10 @@ internal sealed class VerdictReceiver : IHostedService
     {
         try
         {
+            var h = ctx.Response.Headers;
+            h["Access-Control-Allow-Origin"] = "*";
+            h["Access-Control-Allow-Methods"] = "POST, OPTIONS";
+            h["Access-Control-Allow-Headers"] = "content-type";
             ctx.Response.StatusCode = status;
             ctx.Response.Close();
         }
