@@ -15,7 +15,13 @@ obj/
 Thumbs.db
 .DS_Store
 
-# Local-only planning/workflow (kept off the remote) — except the published proof.
+# Local-only planning/workflow (kept off the remote). Published exceptions: proof,
+# the architecture index, and the sqlite backend's db-contract. Build-plan, stage
+# records, and the retired-design notes stay local.
 docs/*
 !docs/PROOF.md
+!docs/architecture.md
+!docs/architecture/
+docs/architecture/*
+!docs/architecture/db-contract.md
 .claude/

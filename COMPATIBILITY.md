@@ -5,8 +5,16 @@ thing (a STAR experience with skills, tags, metrics, entities, and a draft/confi
 a note here maps cleanly onto a STARfolio `experiences` row. This file records that mapping and the
 deltas, so the two stay interoperable.
 
-- **Recall Seed**: one markdown note per experience under `experiences/`, frontmatter + `##` beats.
-  Entities are `[[wikilinks]]`; backlinks are the graph. No database.
+The mapping matters twice over: Recall Seed runs behind an `IExperienceStore` seam with **two
+backends** (`EXPERIENCE_BACKEND`). On the default `vault` backend the mapping is conceptual: a note
+here maps *onto* a STARfolio row. On the opt-in `sqlite` backend it is literal: Recall Seed reads and
+writes STARfolio's own `superstar.db` rows directly over its stable `v_*` views + write contract (see
+[db-contract](docs/architecture/db-contract.md)), so the field map below is the actual read/write shape.
+
+- **Recall Seed (vault backend)**: one markdown note per experience under `experiences/`, frontmatter +
+  `##` beats. Entities are `[[wikilinks]]`; backlinks are the graph. No database.
+- **Recall Seed (sqlite backend)**: reads/writes STARfolio's `superstar.db` directly through the
+  stable `v_*` views + write contract, same tools, same grounding, STARfolio's rows as the store.
 - **STARfolio**: SQLite (`superstar.db`), `experiences` table + joined `skills`/`tags`/`metrics`/
   `sources`, plus `entities` + `edges` for the graph.
 

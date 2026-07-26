@@ -1,7 +1,7 @@
-# Vault — the career harness
+# Vault: the career harness
 
 The durable IP of the frozen STARfolio app, coalesced into Recall Seed as tools over a plain
-Obsidian-style markdown vault. No app, no DB for this half — one experience = one `.md` file, and
+Obsidian-style markdown vault. No app, no DB for this half: one experience = one `.md` file, and
 `[[wikilinks]]` + backlinks are the knowledge graph for free. This module is independent of
 `superstar.db` and STARfolio's loopback; it is the successor, not a proxy.
 
@@ -9,12 +9,12 @@ Obsidian-style markdown vault. No app, no DB for this half — one experience = 
 
 Two disciplines make the output trustworthy, and they live here verbatim in `Prompts.cs`:
 
-1. **Grounding** — never invent a fact, number, employer, outcome, or metric. Absent beats stay
+1. **Grounding**: never invent a fact, number, employer, outcome, or metric. Absent beats stay
    thin + low confidence + a gap question, never self-filled. Metrics preserved verbatim.
-2. **ensureCited** — every non-terminal interview question cites ≥1 real corpus chunk. Enforced,
+2. **ensureCited**: every non-terminal interview question cites ≥1 real corpus chunk. Enforced,
    not merely prompted: `check_citation` validates cited chunk_ids against the real vault.
 
-A third, added here: **tendency-finding** grounded in real aggregates — the counts are computed off
+A third, added here: **tendency-finding** grounded in real aggregates: the counts are computed off
 the whole vault; the agent interprets patterns but cannot invent a number.
 
 The LLM runs in the calling agent (Claude Desktop), not the server. So each tool assembles the
@@ -31,7 +31,7 @@ grounded prompt + the real corpus/aggregates and hands them back; the agent exec
 | `search_experiences` | free-text search over the vault (title/beats/tags/skills/entities), ranked, with snippets |
 | `query_experiences` | structured filter by skills / tags / context / status → experience cards |
 | `get_experience` | fetch one full note by id (frontmatter + beats + metrics + entities + gaps) |
-| `neighbors` | experiences connected via a shared `[[wikilink]]` entity or a shared skill — the graph, emergent from backlinks |
+| `neighbors` | experiences connected via a shared `[[wikilink]]` entity or a shared skill (the graph, emergent from backlinks) |
 | `tailor_bullets` | vault as tagged blocks + the BULLETS prompt → JD-tailored resume bullets, each grounded to one experience id |
 | `generate_story` | named experiences + behavioral-answer prompt + voice rules → a grounded spoken interview answer, provenance to their ids |
 | `debrief_interview` | interview transcript (wrapped as DATA) + debrief prompt + optional experiences → grounded feedback, strengths, gaps, and reconstructed STAR stories; no fabrication |
@@ -51,6 +51,6 @@ tools return a clear error string, never throw over stdio.
 
 Frontmatter: `id, title, context, status, confidence{per-beat}, skills[{name,kind}], tags[],
 metrics[{label,value,unit}], entities[]`. Body: `## Situation/Task/Action/Result` beats, `## Gaps`
-as `- [ ]` todos. `id` is a stable slug — it's what bullets cite; don't rename after they reference it.
+as `- [ ]` todos. `id` is a stable slug: it's what bullets cite; don't rename after they reference it.
 
 Auto-discovered via `[McpServerToolType]`; no `Program.cs` wiring needed.
